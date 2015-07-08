@@ -19,11 +19,8 @@ data Entity =  Entity { ename    :: String,
 type Hero       = Entity
 type Monster    = Entity
 
-
-
-
 attack :: Entity -> Entity -> (Entity, Entity)
-attack hero@(Entity hname hlifes hjob hweapon _)  monster@(Entity mname mlifes mjob mweapon _) = (hero , monster)
+attack hero@(Entity hname hlifes hjob hweapon _)  monster@(Entity mname mlifes mjob mweapon _) = undefined
 
 pickWeapon :: Hero -> Weapon -> Entity
 pickWeapon (Entity hname hlifes hjob hweapon pos) w  = Entity hname hlifes hjob w pos
