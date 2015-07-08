@@ -1,6 +1,7 @@
 module Utils where
 
 
+data Move = UP | DOWN | LEFT | RIGHT
 --data Pos = Pos Int Int Int
 type Pos = (Int, Int)
 
@@ -18,3 +19,15 @@ up'     p = up      p 1
 down'   p = down    p 1
 left'   p = left    p 1
 right'  p = right   p 1
+
+makeMove :: Pos -> Move -> Int -> Pos
+makeMove p UP    n =  up    p n
+makeMove p DOWN  n =  down  p n
+makeMove p LEFT  n =  left  p n
+makeMove p RIGHT n =  right p n
+
+makeMove' :: Pos -> Move -> Pos
+makeMove' p UP    =  up'    p
+makeMove' p DOWN  =  down'  p
+makeMove' p LEFT  =  left'  p
+makeMove' p RIGHT =  right' p
