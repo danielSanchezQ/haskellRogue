@@ -8,5 +8,3 @@ type Map = [[Cell]]
 exampleMap :: Map
 exampleMap = map read ["WWWWW", "WFFFW", "WFFFW","WWWWW"]
 
-drawMap :: Map -> String
-drawMap = show

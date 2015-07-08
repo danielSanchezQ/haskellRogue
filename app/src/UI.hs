@@ -1,10 +1,12 @@
 module UI where
 
-draw :: GameState -> [String]
+import Maps
+
+-- draw :: GameState -> [String]
 draw = undefined
 
 drawMap :: Map -> [String]
 drawMap = map show
 
-parseCommand :: Key -> action
+-- parseCommand :: Key -> action
 parseCommand = undefined
