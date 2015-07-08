@@ -1,15 +1,24 @@
 module Graphics where
 
 import Maps
+import Entities(Entity)
 
--- draw :: GameState -> [String]
-draw = undefined
+draw :: [Entity] -> Map -> [String]
+draw es m = overlayEs (map changeEs es) $ drawMap m
 
-drawCell :: Cell -> String
-drawCell W      = "#"
-drawCell F      = "."
-drawCell _      = "X"
+overlayEs :: [(Int, Int, Char)] -> [[Char]] -> [String]
+overlayEs = undefined
 
-drawMap :: Map -> String
-drawMap = unlines . map (concat . map drawCell)
+changeEs :: Entity -> (Int, Int, Char)
+changeEs =  undefined
 
+drawEntity :: Entity -> Char
+drawEntity _ = '@'
+
+drawCell :: Cell -> Char
+drawCell W      = '#'
+drawCell F      = '.'
+drawCell _      = 'X'
+
+drawMap :: Map -> [[Char]]
+drawMap = map (map drawCell)

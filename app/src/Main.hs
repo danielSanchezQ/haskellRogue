@@ -6,4 +6,4 @@ import Graphics
 
 main :: IO()
 main = do
-    putStrLn $ unlines $ drawMap exampleMap
+    putStrLn $ unlines $ draw [] exampleMap
