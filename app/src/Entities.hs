@@ -38,3 +38,7 @@ hit :: Entity -> Int -> Entity
 hit (Entity hname hlifes hjob hweapon pos) n        = Entity hname remained hjob hweapon pos
     where
         remained = hlifes - n
+
+getPosition :: Entity -> Pos
+getPosition = eposition
+
