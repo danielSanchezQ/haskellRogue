@@ -6,5 +6,5 @@ data Cell = W | F | D
 type Map = [[Cell]]
 
 exampleMap :: Map
-exampleMap = map read ["WWWWW", "WFFFW", "WFFFW","WWWWW"]
+exampleMap = [[W,W,W,W,W],[W,F,F,F,W],[W,F,F,F,W],[W,W,W,W,W]]
 
