@@ -39,3 +39,8 @@ hit (Entity hname hlifes hjob hweapon pos) n        = Entity hname remained hjob
 getPosition :: Entity -> Pos
 getPosition = eposition
 
+exampleEntity :: Entity
+exampleEntity = Entity [] 1 Mage exampleWeapon (2,3)
+
+exampleWeapon :: Weapon
+exampleWeapon = Weapon "example weapon" 1 Rod
