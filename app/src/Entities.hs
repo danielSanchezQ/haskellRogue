@@ -25,8 +25,8 @@ type Monster    = Entity
 attack :: Entity -> Entity -> (Entity, Entity)
 attack hero@(Entity hname hlifes hjob hweapon _)  monster@(Entity mname mlifes mjob mweapon _) = (hero , monster)
 
-pickWapon :: Hero -> Weapon -> Entity
-pickWapon (Entity hname hlifes hjob hweapon pos) w  = Entity hname hlifes hjob w pos
+pickWeapon :: Hero -> Weapon -> Entity
+pickWeapon (Entity hname hlifes hjob hweapon pos) w  = Entity hname hlifes hjob w pos
 
 changeJob :: Hero -> Job -> Entity
 changeJob (Entity hname hlifes hjob hweapon pos) j  = Entity hname hlifes j hweapon pos
