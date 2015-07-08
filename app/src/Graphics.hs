@@ -6,11 +6,10 @@ import Maps
 draw = undefined
 
 drawCell :: Cell -> String
-drawCell W      = "."
-drawCell F      = "#"
+drawCell W      = "#"
+drawCell F      = "."
 drawCell _      = "X"
 
-drawMap :: Map -> [String]
-drawMap = map drawCell
-
+drawMap :: Map -> String
+drawMap = unlines . map (concat . map drawCell)
 
