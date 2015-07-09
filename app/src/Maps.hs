@@ -1,6 +1,7 @@
 module Maps (Floor(), getSize, getCell, Cell(..),generateMap, standardMap, exampleMap) where
 
 import Utils(Pos)
+import Math.Geometry.Grid
 
 data Cell = Wall | Empty | Door | StairDown | StairUp | Window | Exit
     deriving (Show, Read)
