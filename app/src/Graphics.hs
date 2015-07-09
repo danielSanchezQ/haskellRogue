@@ -4,28 +4,19 @@ import Maps
 import Entities(Entity,getPosition)
 
 draw :: [Entity] -> Map -> [String]
-draw es m = overlayEs (map changeEs es) $ drawMap m
-
-overlayEs :: [(Int, Int, Char)] -> [[Char]] -> [String]
-overlayEs es m = zipWith' overlayRow unlinedEs m
+draw es m = foldr overlayEs emptyMap es
     where
-        unlinedEs :: [[(Int, Char)]]
-        unlinedEs = uEs 1 sortedEs
-        uEs :: Int ->[(Int,Int,Char)] -> [[(Int,Char)]]
-        uEs n [] = []
-        uEs n allEs@((x, a, b):es)
-            | n == x    = [(a,b)] : uEs n es
-            | otherwise = []++uEs (n+1) allEs
-        sortedEs = es
+        emptyMap = drawMap m
 
---zipWith that doesnt stop if the first list is empty (too short)
---ToDo: really unoptimized
-zipWith' f as bs = zipWith f as bs ++ restOfBs
+-- ugly and inefficient, ToDo: change to cps or anything better. skapazzo
+-- ToDo: check for out of bounds coordinates
+overlayEs :: Entity -> [String] -> [String]
+overlayEs e cs = take (x-1) cs ++ (overLayEs2 y (cs!!x): drop x cs)
     where
-        restOfBs = drop (length as) bs
-
-overlayRow :: [(Int, Char)] -> String -> String
-overlayRow = undefined
+        (x,y) = getPosition e
+        overLayEs2 :: Int -> String -> String
+        overLayEs2 y cs = take (x-1) cs ++ (char : drop x cs)
+        char = drawEntity e
 
 changeEs :: Entity -> (Int, Int, Char)
 changeEs e = let (x,y) = getPosition e in (x, y, drawEntity e)
