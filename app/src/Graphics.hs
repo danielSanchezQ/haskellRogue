@@ -2,6 +2,9 @@ module Graphics where
 
 import Maps(getCell, getSize, Cell(..), Floor)
 import Entities(Entity, getPosition)
+import Data.List(unfoldr, groupBy)
+import Data.Map(toAscList)
+import Utils(Pos)
 
 draw :: [Entity] -> Floor -> [String]
 draw es m = foldr overlayEs emptyMap es
@@ -32,4 +35,7 @@ drawCell Door      = '+'
 drawCell _         = 'X'
 
 drawMap :: Floor -> [[Char]]
-drawMap = map (map drawCell)
+drawMap (size, floor) = map (map (drawCell . snd)) $ groupBy sameLine $ toAscList floor
+    where
+        sameLine :: (Pos, Cell) -> (Pos, Cell) -> Bool
+        sameLine = (\a b -> (fst $ fst a) == (fst $ fst b))

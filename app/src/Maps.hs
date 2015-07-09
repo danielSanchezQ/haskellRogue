@@ -1,30 +1,26 @@
-module Maps (Floor(), getSize, getCell, Cell(..),generateMap, standardMap, exampleMap) where
+module Maps (Floor(), getSize, getCell, Cell(..),generateMap, standardMap) where
 
 import Utils(Pos)
+import qualified Data.Map.Strict as Map
 
 data Cell = Wall | Empty | Door | StairDown | StairUp | Window | Exit
     deriving (Show, Read)
 
-type Floor = [[Cell]]
+-- | size as Pos, Map of all cells with coordinates as Pos
+type Floor = (Pos, Map.Map Pos Cell)
 
 -- | generate standard map
-standardMap = generateMap (repeat 0) 10 20
-
--- | constant example floor for debugging
-w = Wall
-f = Empty
-exampleMap :: Floor
-exampleMap = [[w,w,w,w,w],[w,f,f,f,w],[w,f,f,f,w],[w,w,w,w,w]]
+standardMap = generateMap (repeat 0) 20 10
 
 -- | generate a floor with specific size
 generateMap :: [Int] -> Int -> Int -> Floor
-generateMap rs = generateRoom z
-    where
-        z = head rs
+generateMap rs = generateRoom
 
-generateRoom ::Int -> Int -> Int -> Floor
-generateRoom _ h w = edge : (take (h-2) $ repeat middle) ++ [edge]
+generateRoom :: Int -> Int -> Floor
+generateRoom w h = ((w, h), Map.fromList $ zip (makeGrid w h) cells)
     where
+        cells :: [Cell]
+        cells = concat $ [edge] ++ (take (h-2) $ repeat middle) ++ [edge]
         edge = take w $ repeat Wall
         middle = Wall : (take (w-2) $ repeat Empty) ++ [Wall]
 
@@ -33,9 +29,11 @@ addExit = undefined
 
 -- | get the Cell at Pos
 getCell :: Floor -> Pos -> Cell
-getCell fl (x,y) = fl!!x!!y
+getCell (_, f) pos = Map.findWithDefault Empty pos f
 
 -- | get the size of a Floor in Pos
 getSize :: Floor -> Pos
-getSize fl = (length fl, length $ head fl)
+getSize (size, _) = size
 
+makeGrid :: Int -> Int -> [(Int, Int)]
+makeGrid w h = concat $ take h $ map (uncurry zip) $ zip ((map (take w . repeat) [1..h])) (repeat [1..w])
