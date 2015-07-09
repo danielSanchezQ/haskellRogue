@@ -1,9 +1,9 @@
 module Graphics where
 
-import Maps
-import Entities(Entity,getPosition)
+import Maps(getCell, getSize, Cell(..), Floor)
+import Entities(Entity, getPosition)
 
-draw :: [Entity] -> Map -> [String]
+draw :: [Entity] -> Floor -> [String]
 draw es m = foldr overlayEs emptyMap es
     where
         emptyMap = drawMap m
@@ -25,9 +25,11 @@ drawEntity :: Entity -> Char
 drawEntity _ = '@'
 
 drawCell :: Cell -> Char
-drawCell W      = '#'
-drawCell F      = '.'
-drawCell _      = 'X'
+drawCell Wall      = '#'
+drawCell Empty     = '.'
+drawCell Window    = 'x'
+drawCell Door      = '+'
+drawCell _         = 'X'
 
-drawMap :: Map -> [[Char]]
+drawMap :: Floor -> [[Char]]
 drawMap = map (map drawCell)
