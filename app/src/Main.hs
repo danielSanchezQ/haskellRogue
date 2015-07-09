@@ -6,4 +6,4 @@ import Graphics
 
 main :: IO()
 main = do
-    putStrLn $ unlines $ draw [exampleEntity] exampleMap
+    putStrLn "Hello World"
