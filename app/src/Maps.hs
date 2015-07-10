@@ -10,14 +10,16 @@ data Cell = Wall | Empty | Door | StairDown | StairUp | Window | Exit
 type Floor = (Pos, Map.Map Pos Cell)
 
 -- | generate standard map
-standardMap = generateMap (repeat 0) 20 10
+standardMap :: Int -> Floor
+standardMap seed = generateMap seed (20,10)
 
 -- | generate a floor with specific size
-generateMap :: [Int] -> Int -> Int -> Floor
-generateMap rs = generateRoom
+--   generateMap takes a seed and a size as Pos
+generateMap :: Int -> Pos -> Floor
+generateMap seed (x,y) = generateRoom seed x y
 
-generateRoom :: Int -> Int -> Floor
-generateRoom w h = ((w, h), Map.fromList $ zip (makeGrid w h) cells)
+generateRoom :: Int -> Int -> Int -> Floor
+generateRoom s w h = ((w, h), Map.fromList $ zip (makeGrid w h) cells)
     where
         cells :: [Cell]
         cells = concat $ [edge] ++ (take (h-2) $ repeat middle) ++ [edge]

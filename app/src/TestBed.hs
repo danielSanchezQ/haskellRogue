@@ -16,4 +16,4 @@ activeTests = testDraw:
               []
 
 -- testDraw :: IO()
-testDraw = putStrLn $ unlines $ draw [exampleEntity] $ standardMap
+testDraw = putStrLn $ unlines $ draw [exampleEntity] $ standardMap (0)
