@@ -1,6 +1,6 @@
 --HASKELL ROGUE GAME MODULE ENTITIES--
-module Entities where
-import Utils (Pos, movePos, up, down, left, right)
+module Entities  where
+import Utils (Pos, Move(..), makeMove')
 
 data Job    =  Mage | Healer | Assassin | Barbarian     deriving (Show)
 data WType  =  Sword | Bow | Rod | Magic                deriving (Show)
@@ -23,21 +23,25 @@ attack :: Entity -> Entity -> (Entity, Entity)
 attack hero@(Entity hname hlifes hjob hweapon _)  monster@(Entity mname mlifes mjob mweapon _) = undefined
 
 pickWeapon :: Hero -> Weapon -> Entity
-pickWeapon (Entity hname hlifes hjob hweapon pos) w  = Entity hname hlifes hjob w pos
+pickWeapon e w = e {eweapon = w}
 
 changeJob :: Hero -> Job -> Entity
-changeJob (Entity hname hlifes hjob hweapon pos) j  = Entity hname hlifes j hweapon pos
+changeJob e j  = e {ejob = j}
 
 kill :: Entity -> Entity
-kill (Entity hname hlifes hjob hweapon pos)         = Entity hname 0 hjob hweapon pos
+kill e = e {elifes = 0}
 
 hit :: Entity -> Int -> Entity
-hit (Entity hname hlifes hjob hweapon pos) n        = Entity hname remained hjob hweapon pos
+hit e n = e {elifes = remained}
     where
-        remained = hlifes - n
+        remained = elifes e - n
+
+moveEntity :: Entity -> Move -> Entity
+moveEntity e m = e {eposition = makeMove' (eposition e) m}
 
 getPosition :: Entity -> Pos
 getPosition = eposition
+
 
 exampleEntity :: Entity
 exampleEntity = Entity [] 1 Mage exampleWeapon (2,3)

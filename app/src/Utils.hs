@@ -31,3 +31,16 @@ makeMove' p UP    =  up'    p
 makeMove' p DOWN  =  down'  p
 makeMove' p LEFT  =  left'  p
 makeMove' p RIGHT =  right' p
+
+
+boundValue :: Int-> Int -> Int -> Int
+boundValue v max min    | v > max   = max
+                        | v < min   = min
+                        | otherwise = v
+
+checkRange :: Pos -> Pos -> Int -> Bool
+checkRange (x1, y1) (x2, y2) r = (round . sqrt $ fromIntegral xysum) <= r
+    where
+        x'      = (x1 - x2) ^ 2
+        y'      = (y1 - y2) ^ 2
+        xysum   = x' + y'
