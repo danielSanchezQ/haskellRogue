@@ -2,18 +2,18 @@
 module Entities  where
 import Utils (Pos, Move(..), makeMove')
 
-data Job    =  Mage | Healer | Assassin | Barbarian     deriving (Show)
-data WType  =  Sword | Bow | Rod | Magic                deriving (Show)
+data Job    =  Mage | Healer | Assassin | Barbarian | Nojob         deriving (Show)
+data WType  =  Sword | Bow | Rod | Magic                            deriving (Show)
 
 data Weapon =  Weapon { wname   :: String, 
                         wpower  :: Int, 
-                        wtype   :: WType}           deriving (Show)
+                        wtype   :: WType} | NoWeapon                deriving (Show)
 
 data Entity =  Entity { ename    :: String,
                         elifes   :: Int,
                         ejob     :: Job, 
                         eweapon  :: Weapon,
-                        eposition:: Pos}            deriving (Show)
+                        eposition:: Pos}                            deriving (Show)
 
 
 type Hero       = Entity
