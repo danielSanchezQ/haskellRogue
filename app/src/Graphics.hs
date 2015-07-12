@@ -40,5 +40,5 @@ drawMap (size, floor) = map (map (drawCell . snd)) $ groupBy sameLine $ toAscLis
         sameLine :: (Pos, Cell) -> (Pos, Cell) -> Bool
         sameLine = (\a b -> (fst $ fst a) == (fst $ fst b))
 
-drawMenu :: Menu -> IO ()
+drawMenu :: String -> IO ()
 drawMenu m = putStrLn m
