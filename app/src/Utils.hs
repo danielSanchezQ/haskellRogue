@@ -1,9 +1,10 @@
 module Utils where
 
 
-data Move = UP | DOWN | LEFT | RIGHT deriving Show
+data Move = UP | DOWN | LEFT | RIGHT deriving (Show, Eq)
 --data Pos = Pos Int Int Int
 type Pos = (Int, Int)
+type Direction = Move -- used in a move HeroAction, conceptually same as Move?
 
 movePos :: Pos -> Pos -> Pos
 movePos (x, y) (x', y') = (x+x', y+y')

@@ -8,7 +8,7 @@ import Utils(Pos)
 import Logic
 
 draw :: GameState -> IO()
-draw gs = putStrLn $ unlines $ drawGS (hero gs : (entities gs)) (world gs)
+draw gs = putStrLn $ unlines $ drawGS (getHero gs : (getEnts gs)) (getMap gs)
 
 drawGS :: [Entity] -> Floor -> [String]
 drawGS es m = foldr overlayEs emptyMap es

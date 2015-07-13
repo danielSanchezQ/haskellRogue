@@ -10,10 +10,10 @@ gameLoop gameState = do
         draw gameState
         command <- readCommand
         case command of
-            Quit -> do putStrLn "Goodbye"
-                       return ()
-            otherwise -> do print command
-                            gameLoop $ step command gameState
+            (Act Quit)  -> do   putStrLn "Goodbye"
+                                return ()
+            (Act a)     -> do   print command
+                                -- gameLoop $ step a gameState
 
 myGame = addEnt newGame exampleEntity
 
