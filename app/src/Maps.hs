@@ -4,7 +4,7 @@ import Utils(Pos)
 import qualified Data.Map.Strict as Map
 
 data Cell = Wall | Empty | Door | StairDown | StairUp | Window | Exit
-    deriving (Show, Read)
+    deriving (Show, Read, Eq)
 
 -- | size as Pos, Map of all cells with coordinates as Pos
 type Floor = (Pos, Map.Map Pos Cell)

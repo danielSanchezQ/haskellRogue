@@ -1,10 +1,11 @@
 module Graphics where
 
 import Maps(getCell, getSize, Cell(..), Floor)
-import Entities(Entity, getPosition)
+import Entities(Entity, getPosition, Race(..),getRace)
 import Data.List(unfoldr, groupBy)
 import Data.Map(toAscList)
 import Utils(Pos)
+import Logic
 
 draw :: [Entity] -> Floor -> [String]
 draw es m = foldr overlayEs emptyMap es
@@ -14,18 +15,29 @@ draw es m = foldr overlayEs emptyMap es
 -- ugly and inefficient, ToDo: change to cps or anything better. skapazzo
 -- ToDo: check for out of bounds coordinates
 overlayEs :: Entity -> [String] -> [String]
-overlayEs e cs = take (y-1) cs ++ (overLayEs2 x (cs!!y): drop y cs)
+overlayEs e lines = take (y-1) lines ++ (overLayEs2 x (lines!!(y-1)): drop y lines)
     where
         (x,y) = getPosition e
         overLayEs2 :: Int -> String -> String
-        overLayEs2 x cs = take (x-1) cs ++ (char : drop x cs)
+        overLayEs2 x cells = take (x-1) cells ++ (char : drop x cells)
         char = drawEntity e
 
 changeEs :: Entity -> (Int, Int, Char)
 changeEs e = let (x,y) = getPosition e in (x, y, drawEntity e)
 
+entitiesTable :: [(Race, Char)]
+entitiesTable = [(Human,    'H'),
+                 (Hero,     '@'),
+                 (Troll,    'T'),
+                 (Dragon,   'D'),
+                 (Elven,    'e'),
+                 (Dwarven,  'd'),
+                 (Feline,   'f')]
+
 drawEntity :: Entity -> Char
-drawEntity _ = '@'
+drawEntity e = case (lookup (getRace e) entitiesTable) of
+        Nothing -> 'D'
+        Just char -> char
 
 drawCell :: Cell -> Char
 drawCell Wall      = '#'
@@ -42,3 +54,8 @@ drawMap (size, floor) = map (map (drawCell . snd)) $ groupBy sameLine $ toAscLis
 
 drawMenu :: String -> IO ()
 drawMenu m = putStrLn m
+
+drawGameState :: GameState -> [[Char]]
+drawGameState gs = draw ents (world gs)
+    where
+        ents = hero gs : (entities gs)
