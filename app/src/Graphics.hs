@@ -7,8 +7,11 @@ import Data.Map(toAscList)
 import Utils(Pos)
 import Logic
 
-draw :: [Entity] -> Floor -> [String]
-draw es m = foldr overlayEs emptyMap es
+draw :: GameState -> IO()
+draw gs = putStrLn $ unlines $ drawGS (hero gs : (entities gs)) (world gs)
+
+drawGS :: [Entity] -> Floor -> [String]
+drawGS es m = foldr overlayEs emptyMap es
     where
         emptyMap = drawMap m
 
@@ -55,7 +58,7 @@ drawMap (size, floor) = map (map (drawCell . snd)) $ groupBy sameLine $ toAscLis
 drawMenu :: String -> IO ()
 drawMenu m = putStrLn m
 
-drawGameState :: GameState -> [[Char]]
-drawGameState gs = draw ents (world gs)
-    where
-        ents = hero gs : (entities gs)
+-- drawGameState :: GameState -> [[Char]]
+-- drawGameState gs = draw ents (world gs)
+--     where
+--         ents = hero gs : (entities gs)

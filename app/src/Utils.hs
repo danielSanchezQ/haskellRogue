@@ -1,7 +1,7 @@
 module Utils where
 
 
-data Move = UP | DOWN | LEFT | RIGHT
+data Move = UP | DOWN | LEFT | RIGHT deriving Show
 --data Pos = Pos Int Int Int
 type Pos = (Int, Int)
 
@@ -32,6 +32,11 @@ makeMove' p DOWN  =  down'  p
 makeMove' p LEFT  =  left'  p
 makeMove' p RIGHT =  right' p
 
+moveToPos :: Move -> Pos
+moveToPos UP    = (0,-1)
+moveToPos DOWN  = (0, 1)
+moveToPos RIGHT = (1, 0)
+moveToPos LEFT  = (-1, 0)
 
 boundValue :: Int-> Int -> Int -> Int
 boundValue v max min    | v > max   = max

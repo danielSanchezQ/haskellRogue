@@ -3,13 +3,7 @@ import Control.Monad
 import Utils        (Move(..))
 import Graphics     (drawMenu)
 import Data.Char    (digitToInt)
-
-data Action a   = Action a  | None  | Menu | Quit   deriving (Show, Eq)
-
-instance Monad Action where
-    return a          = Action a 
-    (Action a)  >>= f = f a
-    None        >>= _ = None
+import Logic
 
 data Choice     = Accept    | Deny | Choice Int     deriving (Show, Eq)
 
@@ -19,7 +13,6 @@ allChoices      = yesNoChoice ++ numeralChoice
 
 type Message    = String
 type Menu       = Message
-
 
 parseCommand :: Char -> Action Move
 parseCommand 'w' = Action UP
@@ -35,7 +28,6 @@ parseChoice 'y' = Action Accept
 parseChoice 'n' = Action Deny
 parseChoice  c  | c `elem` ['0'..'9']   = Action (Choice (digitToInt c))
                 | otherwise             = None
-
 
 --abstraction for taking commands, run with parse* to get an action. Daniel
 readInput :: (Char -> Action a) -> IO (Action a)
@@ -53,8 +45,6 @@ ask m cs rf = do
     case e of
         None        -> ask m cs rf
         otherwise   -> if e `elem` [Action x | x <- cs] then return e else ask m cs rf
-            
-
 
 ----ask "asndfoasidhfaspodifh" [Accept, Deny] readChoice
 

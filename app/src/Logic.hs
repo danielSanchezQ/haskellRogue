@@ -3,13 +3,19 @@ module Logic where
 import Utils
 import Entities
 import Maps
+-- import UI
+data Action a   = Action a  | None  | Menu | Quit   deriving (Show, Eq)
+
+instance Monad Action where
+    return a          = Action a 
+    (Action a)  >>= f = f a
+    None        >>= _ = None
+
 
 data GameState = GameState { hero :: Hero,
                              entities :: [Entity],
                              world :: Floor
                            } deriving Show
-
-data Action = Move
 
 -- ToDo: pass random to map generator
 newGame :: GameState
@@ -47,5 +53,17 @@ isPositionValid gameState pos = isFloor && noEntity && (isValidPos pos)
         isFloor = (getCell (getMap gameState) pos) == Empty
         noEntity = not $ any ((pos ==) . getPosition) $ entities gameState
 
-act :: GameState -> Action -> GameState
-act = undefined
+healHero :: GameState -> GameState
+healHero = id
+
+step :: Action a -> GameState -> GameState
+step a gs = 
+        case (moveHero gs (moveToPos a)) of
+            Nothing           Just ngs    -> ngs
+
+-- ioStep :: GameState -> Action a -> IO()
+-- ioStep gameState command = do
+--         case command of
+--             Menu        -> askMenu
+--             Quit        -> return()
+            -- m@(_)       -> ioStep $ step m gameState

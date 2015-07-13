@@ -26,4 +26,5 @@ myGame = addEnt newGame exampleEntity
 testMove :: GameState -> IO()
 testMove gs = case moveHero gs (-1,-1) of
                 Nothing -> putStrLn "Illegal Move"
-                Just gs -> putStrLn $ unlines $ drawGameState gs
+                Just gs -> putStrLn $ unlines $ draw (hero gs : (entities gs)) $ world gs
+
