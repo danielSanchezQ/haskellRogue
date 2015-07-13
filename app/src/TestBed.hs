@@ -25,7 +25,7 @@ activeTests =
 myGame = addEnt newGame exampleEntity
 
 testMove :: GameState -> IO()
-testMove gs = case moveHero gs DOWN of
+testMove gs = case moveHero gs RIGHT of
                 Nothing -> putStrLn "Illegal Move"
                 Just gs -> draw gs -- (getHero gs : (getEnts gs)) $ getMap gs
 

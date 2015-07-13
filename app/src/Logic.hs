@@ -56,7 +56,7 @@ getEnts :: GameState -> [Entity]
 getEnts = entities
 
 newHero :: Hero
-newHero = Entity {ename="Urist", elifes=1, ejob=NoJob, eweapon=NoWeapon, eposition=(3,5), erace=Hero}
+newHero = Entity {ename="Urist", elifes=1, ejob=NoJob, eweapon=NoWeapon, eposition=(9,5), erace=Hero}
 
 --Does not check entity position
 addEnt :: GameState -> Entity -> GameState

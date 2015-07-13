@@ -8,7 +8,9 @@ import Utils(Pos)
 import Logic
 
 draw :: GameState -> IO()
-draw gs = putStrLn $ unlines $ drawGS (getHero gs : (getEnts gs)) (getMap gs)
+draw gs = do
+    putStrLn $ unlines $ drawGS (getHero gs : (getEnts gs)) (getMap gs)
+    putStrLn ("hero position: "++ (show $ getPosition $ getHero gs))
 
 drawGS :: [Entity] -> Floor -> [String]
 drawGS es m = foldr overlayEs emptyMap es

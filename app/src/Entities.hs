@@ -41,8 +41,9 @@ hit e n = e {elifes = remained}
 moveEntity :: Entity -> Move -> Entity
 moveEntity e m = e {eposition = makeMove' (eposition e) m}
 
-moveEntityP :: Entity -> Pos -> Entity
-moveEntityP e pos = e {eposition = movePos pos (eposition e)}
+-- not needed ATM
+-- moveEntityP :: Entity -> Pos -> Entity
+-- moveEntityP e pos = e {eposition = movePos pos (eposition e)}
 
 getRace :: Entity -> Race
 getRace = erace
