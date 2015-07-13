@@ -64,11 +64,11 @@ addEnt gameState ent = gameState {entities=entities gameState ++[ent]}
 
 moveHero :: GameState -> Direction -> Maybe GameState
 moveHero gameState dir
-    | isPositionValid gameState (x1 + x2, y1 + y2)     = Just newState
+    | isPositionValid gameState (x2,y2)     = Just newState
     | otherwise                             = Nothing
         where
             (x1,y1) = getPosition $ getHero gameState
-            (x2,y2) = makeMove' (x1,y1) dir 
+            (x2,y2) = makeMove' (x1,y1) dir
             newState = gameState {hero = moveEntity (hero gameState) dir}
 
 isPositionValid :: GameState -> Pos -> Bool
