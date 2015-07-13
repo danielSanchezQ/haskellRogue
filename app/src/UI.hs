@@ -32,6 +32,12 @@ parseCommand 'w' = TA $ HeroMove UP
 parseCommand 's' = TA $ HeroMove DOWN
 parseCommand 'a' = TA $ HeroMove LEFT
 parseCommand 'd' = TA $ HeroMove RIGHT
+--for stupid dvorak users
+parseCommand 't' = TA $ HeroMove UP
+parseCommand 'n' = TA $ HeroMove DOWN
+parseCommand 'h' = TA $ HeroMove LEFT
+parseCommand '-' = TA $ HeroMove RIGHT
+
 parseCommand 'm' = Menu
 parseCommand 'q' = Quit
 parseCommand  _  = NoAction
