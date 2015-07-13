@@ -39,7 +39,7 @@ parseChoice  c  | c `elem` ['0'..'9']   = Action (Choice (digitToInt c))
 
 --abstraction for taking commands, run with parse* to get an action. Daniel
 readInput :: (Char -> Action a) -> IO (Action a)
-readInput rf m = do
+readInput rf = do
     c <- getChar
     return (rf c)
 
