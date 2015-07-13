@@ -1,7 +1,7 @@
 module Utils where
 
 
-data Move = UP | DOWN | LEFT | RIGHT deriving Show
+data Move = UP | DOWN | LEFT | RIGHT deriving (Show, Eq)
 --data Pos = Pos Int Int Int
 type Pos = (Int, Int)
 
