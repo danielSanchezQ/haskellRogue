@@ -6,9 +6,10 @@ import Data.List(unfoldr, groupBy, sortBy)
 import Data.Map(toList)
 import Utils(Pos)
 import Logic
+import Control.Monad
 
 
-clearAndDraw :: (a->IO()) -> IO()
+clearAndDraw :: (a->IO())-> a -> IO()
 clearAndDraw f a = do
     replicateM_ 100 (putStrLn "")
     f a
