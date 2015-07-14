@@ -4,6 +4,7 @@ import Entities
 import Utils
 import Graphics
 import Logic
+import System.IO
 
 gameLoop :: GameState -> IO()
 gameLoop gameState = do
@@ -23,4 +24,6 @@ myGame = addEnt newGame exampleEntity
 
 main :: IO()
 main = do
+        hSetBuffering stdin NoBuffering
+        hSetBuffering stdout NoBuffering
         gameLoop myGame
