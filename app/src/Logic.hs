@@ -43,7 +43,7 @@ newGame :: GameState
 newGame = GameState {hero=newHero, entities=[], world=standardMap 0}
 
 newHero :: Hero
-newHero = Entity {ename="Urist", elifes=3, ejob=NoJob, eweapon=NoWeapon, eposition=(9,5), erace=Hero}
+newHero = Entity {ename="Urist", elifes=3, ejob=NoJob, eweapon=NoWeapon, eposition=(9,5), erace=Hero, ebehav=Seek}
 
 --Does not check entity position
 addEnt :: GameState -> Entity -> GameState
