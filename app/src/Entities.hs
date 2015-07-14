@@ -1,7 +1,7 @@
 --HASKELL ROGUE GAME MODULE ENTITIES--
 module Entities  where
 import Utils (Pos, Move(..), makeMove', movePos)
-
+import Maps
 data Job    =  Mage | Healer | Assassin | Barbarian | NoJob         deriving (Show,Eq)
 data WType  =  Sword | Bow | Rod | Magic                            deriving (Show,Eq)
 data Race   =  Hero | Human | Troll | Dragon | Elven | Feline | Dwarven    deriving (Show,Eq)
@@ -20,6 +20,24 @@ data Entity =  Entity { ename    :: String,
 
 type Hero       = Entity
 type Monster    = Entity
+
+---------------------------------------------------------------
+data GameState = GameState { hero :: Hero,
+                             entities :: [Entity],
+                             world :: Floor
+                           } deriving Show
+
+getMap :: GameState -> Floor
+getMap = world
+
+getHero :: GameState -> Hero
+getHero = hero
+
+getEnts :: GameState -> [Entity]
+getEnts = entities
+---------------------------------------------------------------
+
+
 
 attack :: Entity -> Entity -> (Entity, Entity)
 attack hero monster = (hero{elifes = elifes hero -1}, monster{elifes = elifes monster -1})

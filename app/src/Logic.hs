@@ -39,23 +39,8 @@ import Data.List(find,delete)
 
 data TurnAction = HeroMove Direction | Ranged Pos | Rest    deriving (Show,Eq)
 
-data GameState = GameState { hero :: Hero,
-                             entities :: [Entity],
-                             world :: Floor
-                           } deriving Show
-
--- ToDo: pass random to map generator
 newGame :: GameState
 newGame = GameState {hero=newHero, entities=[], world=standardMap 0}
-
-getMap :: GameState -> Floor
-getMap = world
-
-getHero :: GameState -> Hero
-getHero = hero
-
-getEnts :: GameState -> [Entity]
-getEnts = entities
 
 newHero :: Hero
 newHero = Entity {ename="Urist", elifes=3, ejob=NoJob, eweapon=NoWeapon, eposition=(9,5), erace=Hero}
