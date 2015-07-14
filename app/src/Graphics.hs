@@ -7,6 +7,13 @@ import Data.Map(toAscList)
 import Utils(Pos)
 import Logic
 
+
+clearAndDraw :: (a->IO()) -> IO()
+clearAndDraw f a = do
+    replicateM_ 100 (putStrLn "")
+    f a
+    replicateM_ 20  (putStrLn "")
+
 draw :: GameState -> IO()
 draw gs = do
     putStrLn $ unlines $ drawGS (getHero gs : (getEnts gs)) (getMap gs)

@@ -6,10 +6,11 @@ import Graphics
 import Logic
 import System.IO
 
+
 gameLoop :: GameState -> IO()
 gameLoop gameState = do
         putStrLn "---------------------\n"
-        draw gameState
+        clearAndDraw draw gameState
         command <- readCommand
         print command
         case command of
