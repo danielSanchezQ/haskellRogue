@@ -50,3 +50,4 @@ checkRange (x1, y1) (x2, y2) r = (round . sqrt $ fromIntegral xysum) <= r
         x'      = (x1 - x2) ^ 2
         y'      = (y1 - y2) ^ 2
         xysum   = x' + y'
+

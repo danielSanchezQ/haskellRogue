@@ -34,6 +34,8 @@ module Logic
 import Utils
 import Entities
 import Maps
+import Data.List(find,delete)
+
 
 data TurnAction = HeroMove Direction | Ranged Pos | Rest    deriving (Show,Eq)
 
@@ -56,7 +58,7 @@ getEnts :: GameState -> [Entity]
 getEnts = entities
 
 newHero :: Hero
-newHero = Entity {ename="Urist", elifes=1, ejob=NoJob, eweapon=NoWeapon, eposition=(9,5), erace=Hero}
+newHero = Entity {ename="Urist", elifes=3, ejob=NoJob, eweapon=NoWeapon, eposition=(9,5), erace=Hero}
 
 --Does not check entity position
 addEnt :: GameState -> Entity -> GameState
@@ -64,23 +66,61 @@ addEnt gameState ent = gameState {entities=entities gameState ++[ent]}
 
 moveHero :: GameState -> Direction -> Maybe GameState
 moveHero gameState dir
-    | isPositionValid gameState (x2,y2)     = Just newState
+    | isPositionWalkable gameState (x2,y2)  = Just gameState {hero = moveEntity (hero gameState) dir}
+    | isPositionAttackable gameState (x2,y2)= Just $ doCombat gameState (x2,y2)
     | otherwise                             = Nothing
         where
             (x1,y1) = getPosition $ getHero gameState
             (x2,y2) = makeMove' (x1,y1) dir
-            newState = gameState {hero = moveEntity (hero gameState) dir}
+
+doCombat :: GameState -> Pos -> GameState
+doCombat gameState pos = gameState {hero=newHero, entities=newEntities}
+    where
+        (newHero,newEnt) = attack (hero gameState) enemy
+        enemy :: Entity
+        enemy = case lookupPos pos $ getEnts gameState of
+                    Just e  -> e
+                    Nothing -> error "attacked an empty position"
+        newEntities = if (getHealth newEnt) > 0 then replaceEnt newEnt $ getEnts gameState
+                        -- else delete enemy $ getEnts gameState
+                        else addRandomEnemy $ delete enemy $ getEnts gameState
+
+addRandomEnemy :: [Entity] -> [Entity]
+addRandomEnemy = (++ [randomEnt])
+
+replaceEnt :: Entity -> [Entity] -> [Entity]
+replaceEnt e [] = [e]
+replaceEnt e (e1:es)
+    | getPosition e == getPosition e1     = e:es
+    | otherwise                 = e1: replaceEnt e es
+
+lookupPos :: Pos -> [Entity] -> Maybe Entity
+lookupPos pos = find ((==) pos . getPosition)
+
+isPositionWalkable :: GameState -> Pos -> Bool
+isPositionWalkable gs pos = isPositionValid gs pos &&
+                            isPositionEmpty gs pos &&
+                            ((getCell (getMap gs) pos) == Empty)
+
+isPositionAttackable :: GameState -> Pos -> Bool
+isPositionAttackable gs pos = isPositionValid gs pos &&
+                              (Nothing /= (lookupPos pos $ getEnts gs))
+
+-- | checks if there are entities on a position
+isPositionEmpty :: GameState -> Pos -> Bool
+isPositionEmpty gs pos = isPositionValid gs pos && (not $ any ((pos ==) . getPosition) $ entities gs)
 
 isPositionValid :: GameState -> Pos -> Bool
-isPositionValid gameState pos = isFloor && noEntity && (isValidPos pos)
+isPositionValid gameState pos = isValidPos pos
     where
         isValidPos (x,y) = (x>0) && (y>0) && (x<=xmax) && (y<=ymax)
         (xmax, ymax) = getSize $ getMap gameState
-        isFloor = (getCell (getMap gameState) pos) == Empty
-        noEntity = not $ any ((pos ==) . getPosition) $ entities gameState
 
 healHero :: GameState -> GameState
 healHero = id
+
+attackEntity :: GameState -> Direction -> GameState
+attackEntity = const
 
 step :: TurnAction -> GameState -> GameState
 step (Rest) gs = gs

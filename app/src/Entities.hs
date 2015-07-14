@@ -2,27 +2,27 @@
 module Entities  where
 import Utils (Pos, Move(..), makeMove', movePos)
 
-data Job    =  Mage | Healer | Assassin | Barbarian | NoJob         deriving (Show)
-data WType  =  Sword | Bow | Rod | Magic                            deriving (Show)
+data Job    =  Mage | Healer | Assassin | Barbarian | NoJob         deriving (Show,Eq)
+data WType  =  Sword | Bow | Rod | Magic                            deriving (Show,Eq)
 data Race   =  Hero | Human | Troll | Dragon | Elven | Feline | Dwarven    deriving (Show,Eq)
 
 data Weapon =  Weapon { wname   :: String, 
                         wpower  :: Int, 
-                        wtype   :: WType} | NoWeapon                deriving (Show)
+                        wtype   :: WType} | NoWeapon                deriving (Show,Eq)
 
 data Entity =  Entity { ename    :: String,
                         elifes   :: Int,
                         ejob     :: Job, 
                         eweapon  :: Weapon,
                         eposition:: Pos,
-                        erace    :: Race }                            deriving (Show)
+                        erace    :: Race }                            deriving (Show,Eq)
 
 
 type Hero       = Entity
 type Monster    = Entity
 
 attack :: Entity -> Entity -> (Entity, Entity)
-attack hero@(Entity hname hlifes hjob hweapon _ _)  monster@(Entity mname mlifes mjob mweapon _ _) = undefined
+attack hero monster = (hero{elifes = elifes hero -1}, monster{elifes = elifes monster -1})
 
 pickWeapon :: Hero -> Weapon -> Entity
 pickWeapon e w = e {eweapon = w}
@@ -51,8 +51,14 @@ getRace = erace
 getPosition :: Entity -> Pos
 getPosition = eposition
 
+getHealth :: Entity -> Int
+getHealth = elifes
+
 exampleEntity :: Entity
 exampleEntity = Entity [] 1 Mage exampleWeapon (2,3) Elven
+
+randomEnt :: Entity
+randomEnt = Entity [] 5 Healer exampleWeapon (12,7) Troll
 
 exampleWeapon :: Weapon
 exampleWeapon = Weapon "example weapon" 1 Rod
