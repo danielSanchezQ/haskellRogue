@@ -9,7 +9,7 @@ import System.IO
 gameLoop :: GameState -> IO()
 gameLoop gameState = do
         if (getHealth $ getHero $ gameState) <= 0 then do
-            choice <- ask "/nYou died!!/nWant to try again y/n" yesNoChoice
+            choice <- ask "\nYou died!!\nWant to try again y/n" yesNoChoice
             case choice of
                 Accept      -> gameLoop myGame
                 Deny        -> putStrLn "Goodbye" >> return ()
