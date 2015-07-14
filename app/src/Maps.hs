@@ -31,7 +31,7 @@ addExit = undefined
 
 -- | get the Cell at Pos
 getCell :: Floor -> Pos -> Cell
-getCell (_, f) pos = Map.findWithDefault Empty pos f
+getCell (_, f) pos = Map.findWithDefault Wall pos f
 
 -- | get the size of a Floor in Pos
 getSize :: Floor -> Pos
