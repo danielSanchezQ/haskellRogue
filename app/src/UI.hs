@@ -17,8 +17,8 @@ import Logic --hiding (TurnAction)
 -- possible actions from Logic
 
 -- data TurnAction = HeroMove Direction | Ranged Pos | Rest    deriving (Show,Eq)
-data Action = TA TurnAction | Menu | Quit | NoAction           deriving (Show,Eq)
-data Choice = Accept | Deny | Choice Int | NoChoice         deriving (Show,Eq)
+data Action = TA TurnAction | Menu | Quit   | NoAction           deriving (Show,Eq)
+data Choice = Accept | Deny | Choice Int    | NoChoice            deriving (Show,Eq)
 
 yesNoChoice     = [Accept, Deny]
 numeralChoice   = [Choice n | n <- [0..9]]
@@ -56,13 +56,13 @@ parseChoice  c  | c `elem` ['0'..'9']   = Choice (digitToInt c)
 --Would need another layer over Action to return Actions and Choices at the same time
 --is it worth the mess? Nic
 
-readInput :: (Char -> Action) -> IO (Action)
+readInput :: (Char -> a) -> IO (a)
 readInput rf = do
     c <- getChar
     return (rf c)
 
 readCommand = readInput parseCommand
--- readChoice  = readInput parseChoice
+readChoice  = readInput parseChoice
 
 ask :: Menu -> [Choice] -> IO(Choice)
 ask m cs = do
@@ -72,6 +72,3 @@ ask m cs = do
         case choice of
             NoChoice    -> ask m cs
             otherwise   -> if choice `elem` cs then return choice else ask m cs
-
-----ask "asndfoasidhfaspodifh" [Accept, Deny] readChoice
-
