@@ -11,7 +11,7 @@ instance Monad Action where
     (Act a)  >>= f = f a
     None        >>= _ = None
 
-data Choice     = Accept    | Deny | Choice Int                     deriving (Show, Eq)
+data Choice     = Accept        | Deny | Choice Int            deriving (Show, Eq)
 data Command    = Movement Move | Menu | Quit                  deriving (Show, Eq)
 
 data GameState = GameState { hero :: Hero,
