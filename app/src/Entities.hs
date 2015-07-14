@@ -2,9 +2,10 @@
 module Entities  where
 import Utils (Pos, Move(..), makeMove', movePos)
 import Maps
-data Job    =  Mage | Healer | Assassin | Barbarian | NoJob         deriving (Show,Eq)
-data WType  =  Sword | Bow | Rod | Magic                            deriving (Show,Eq)
-data Race   =  Hero | Human | Troll | Dragon | Elven | Feline | Dwarven    deriving (Show,Eq)
+data Job        =  Mage     | Healer| Assassin  | Barbarian | NoJob                        deriving (Show,Eq)
+data WType      =  Sword    | Bow   | Rod       | Magic                                    deriving (Show,Eq)
+data Race       =  Hero     | Human | Troll     | Dragon | Elven | Feline | Dwarven        deriving (Show,Eq)
+data Behaviour  =  Seek     | Escape| Watch     | NoBehave                                 deriving (Show,Eq)
 
 data Weapon =  Weapon { wname   :: String, 
                         wpower  :: Int, 
@@ -15,7 +16,8 @@ data Entity =  Entity { ename    :: String,
                         ejob     :: Job, 
                         eweapon  :: Weapon,
                         eposition:: Pos,
-                        erace    :: Race }                            deriving (Show,Eq)
+                        erace    :: Race,
+                        ebehav   :: Behaviour }                     deriving (Show,Eq)
 
 
 type Hero       = Entity
@@ -73,10 +75,10 @@ getHealth :: Entity -> Int
 getHealth = elifes
 
 exampleEntity :: Entity
-exampleEntity = Entity [] 1 Mage exampleWeapon (2,3) Elven
+exampleEntity = Entity [] 1 Mage exampleWeapon (2,3) Elven Seek
 
 randomEnt :: Entity
-randomEnt = Entity [] 5 Healer exampleWeapon (12,7) Troll
+randomEnt = Entity [] 5 Healer exampleWeapon (12,7) Troll Seek
 
 exampleWeapon :: Weapon
 exampleWeapon = Weapon "example weapon" 1 Rod

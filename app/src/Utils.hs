@@ -1,10 +1,26 @@
 module Utils where
 
 
-data Move = UP | DOWN | LEFT | RIGHT deriving (Show, Eq)
+data Move = UP | DOWN | LEFT | RIGHT | STAY deriving (Show, Eq)
 --data Pos = Pos Int Int Int
 type Pos = (Int, Int)
 type Direction = Move -- used in a move HeroAction, conceptually same as Move?
+
+reverseMove :: Move -> Move
+reverseMove UP      = DOWN
+reverseMove DOWN    = UP
+reverseMove LEFT    = RIGHT
+reverseMove RIGHT   = LEFT
+
+movefromPos :: Pos -> Pos -> Move
+movefromPos (x1, y1) (x2, y2)   | x1 > x2 && y1 > y2 = if xdif > ydif then LEFT     else DOWN
+                                | x1 > x2 && y1 < y2 = if xdif > ydif then LEFT     else UP
+                                | x1 < x2 && y1 > y2 = if xdif > ydif then RIGHT    else DOWN
+                                | x1 < x2 && y1 < y2 = if xdif > ydif then RIGHT    else UP
+                                where
+                                    xdif = abs $ x1 - x2
+                                    ydif = abs $ y1 - y2
+
 
 movePos :: Pos -> Pos -> Pos
 movePos (x, y) (x', y') = (x+x', y+y')
