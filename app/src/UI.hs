@@ -5,6 +5,7 @@ import Graphics     (drawMenu)
 import Data.Char    (digitToInt)
 import Logic
 
+data Choice     = Accept    | Deny | Choice Int     deriving (Show, Eq)
 
 yesNoChoice     = [Accept, Deny]
 numeralChoice   = [Choice n | n <- [0..9]]
@@ -13,19 +14,19 @@ allChoices      = yesNoChoice ++ numeralChoice
 type Message    = String
 type Menu       = Message
 
-parseCommand :: Char -> Action Command
-parseCommand 'w' = Act  (Movement UP    )
-parseCommand 's' = Act  (Movement DOWN  )
-parseCommand 'a' = Act  (Movement LEFT  )
-parseCommand 'd' = Act  (Movement RIGHT )
-parseCommand 'm' = Act  Menu
-parseCommand 'q' = Act  Quit
+parseCommand :: Char -> Action Move
+parseCommand 'w' = Action UP
+parseCommand 's' = Action DOWN
+parseCommand 'a' = Action LEFT
+parseCommand 'd' = Action RIGHT
+parseCommand 'm' = Menu
+parseCommand 'q' = Quit
 parseCommand  _  = None
 
 parseChoice :: Char -> Action Choice
-parseChoice 'y' = Act Accept
-parseChoice 'n' = Act Deny
-parseChoice  c  | c `elem` ['0'..'9']   = Act (Choice (digitToInt c))
+parseChoice 'y' = Action Accept
+parseChoice 'n' = Action Deny
+parseChoice  c  | c `elem` ['0'..'9']   = Action (Choice (digitToInt c))
                 | otherwise             = None
 
 --abstraction for taking commands, run with parse* to get an action. Daniel
@@ -43,7 +44,7 @@ ask m cs rf = do
     e <- rf m
     case e of
         None        -> ask m cs rf
-        otherwise   -> if e `elem` [Act x | x <- cs] then return e else ask m cs rf
+        otherwise   -> if e `elem` [Action x | x <- cs] then return e else ask m cs rf
 
 ----ask "asndfoasidhfaspodifh" [Accept, Deny] readChoice
 

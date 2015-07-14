@@ -3,16 +3,14 @@ module Logic where
 import Utils
 import Entities
 import Maps
-
-data Action a   = Act a  | None   deriving (Show, Eq)
+-- import UI
+data Action a   = Action a  | None  | Menu | Quit   deriving (Show, Eq)
 
 instance Monad Action where
-    return a          = Act a 
-    (Act a)  >>= f = f a
+    return a          = Action a 
+    (Action a)  >>= f = f a
     None        >>= _ = None
 
-data Choice     = Accept    | Deny | Choice Int                     deriving (Show, Eq)
-data Command    = Movement Move | Menu | Quit                  deriving (Show, Eq)
 
 data GameState = GameState { hero :: Hero,
                              entities :: [Entity],
@@ -58,12 +56,10 @@ isPositionValid gameState pos = isFloor && noEntity && (isValidPos pos)
 healHero :: GameState -> GameState
 healHero = id
 
-step ::  Command -> GameState -> GameState
-step a gs = case a of    
-    (Movement m)    -> newGame
-    Menu            -> newGame
-
-
+step :: Action a -> GameState -> GameState
+step a gs = 
+        case (moveHero gs (moveToPos a)) of
+            Nothing           Just ngs    -> ngs
 
 -- ioStep :: GameState -> Action a -> IO()
 -- ioStep gameState command = do
