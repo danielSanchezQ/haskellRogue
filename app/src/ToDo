@@ -1,0 +1,8 @@
+Ideas:
+    switch changing data structures to Lenses (floormaps, entities and its members)
+    change GameState to monadic (could make its use easyer)
+
+ToDo:
+    use Random please...
+
+Bugs:
