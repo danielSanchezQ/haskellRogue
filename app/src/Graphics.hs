@@ -1,9 +1,9 @@
 module Graphics where
 
 import Maps(getCell, getSize, Cell(..), Floor)
-import Entities(Entity, getPosition, Race(..),getRace)
-import Data.List(unfoldr, groupBy)
-import Data.Map(toAscList)
+import Entities(Entity, getPosition, Race(..),getRace,getHealth)
+import Data.List(unfoldr, groupBy, sortBy)
+import Data.Map(toList)
 import Utils(Pos)
 import Logic
 
@@ -17,7 +17,8 @@ clearAndDraw f a = do
 draw :: GameState -> IO()
 draw gs = do
     putStrLn $ unlines $ drawGS (getHero gs : (getEnts gs)) (getMap gs)
-    putStrLn ("hero position: "++ (show $ getPosition $ getHero gs))
+    -- putStrLn ("hero position: "++ (show $ getPosition $ getHero gs)
+    putStrLn ("\tLife: " ++ (show $ getHealth $ getHero gs))
 
 drawGS :: [Entity] -> Floor -> [String]
 drawGS es m = foldr overlayEs emptyMap es
@@ -59,10 +60,17 @@ drawCell Door      = '+'
 drawCell _         = 'X'
 
 drawMap :: Floor -> [[Char]]
-drawMap (size, floor) = map (map (drawCell . snd)) $ groupBy sameLine $ toAscList floor
+drawMap (size, floor) = map (map (drawCell . snd)) $ groupBy sameLine $ sortBy sorting $ toList floor
     where
         sameLine :: (Pos, Cell) -> (Pos, Cell) -> Bool
-        sameLine = (\a b -> (fst $ fst a) == (fst $ fst b))
+        sameLine = (\a b -> (snd $ fst a) == (snd $ fst b))
+        sorting :: (Pos, Cell) -> (Pos, Cell) -> Ordering
+        sorting ((x1,y1),_) ((x2,y2),_)
+            | y1 > y2       = GT
+            | y1 < y2       = LT
+            | x1 > x2       = GT
+            | x1 < x1       = LT
+            | otherwise     = EQ
 
 drawMenu :: String -> IO ()
 drawMenu m = putStrLn m
