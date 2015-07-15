@@ -27,6 +27,8 @@ module Logic
         getEnts,
         newHero,
         addEnt,
+        stepHero,
+        stepEntities,
         step
         )
         where
@@ -35,7 +37,7 @@ import Utils
 import Entities
 import Maps
 import Data.List(find,delete)
-
+import AI
 
 data TurnAction = HeroMove Direction | Ranged Pos | Rest    deriving (Show,Eq)
 
@@ -107,12 +109,18 @@ healHero = id
 attackEntity :: GameState -> Direction -> GameState
 attackEntity = const
 
-step :: TurnAction -> GameState -> GameState
-step (Rest) gs = gs
-step (Ranged _) gs = gs
-step (HeroMove dir) gs = 
+stepHero :: TurnAction -> GameState -> GameState
+stepHero (Rest) gs = gs
+stepHero (Ranged _) gs = gs
+stepHero (HeroMove dir) gs = 
         case (newGS) of
             Nothing         -> gs
             Just ngs        -> ngs
         where
             newGS = moveHero gs dir
+
+stepEntities :: GameState -> GameState
+stepEntities gs = gs {entities = map (\x-> let m = evalBehaviour x gs in (if isPositionWalkable gs (makeMove' (eposition x) m)  then moveEntity x m else x)) (entities gs)}
+
+step :: TurnAction -> GameState -> GameState
+step ta gs = stepEntities $ stepHero ta gs

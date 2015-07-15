@@ -13,10 +13,11 @@ reverseMove LEFT    = RIGHT
 reverseMove RIGHT   = LEFT
 
 movefromPos :: Pos -> Pos -> Move
-movefromPos (x1, y1) (x2, y2)   | x1 > x2 && y1 > y2 = if xdif > ydif then LEFT     else DOWN
-                                | x1 > x2 && y1 < y2 = if xdif > ydif then LEFT     else UP
-                                | x1 < x2 && y1 > y2 = if xdif > ydif then RIGHT    else DOWN
-                                | x1 < x2 && y1 < y2 = if xdif > ydif then RIGHT    else UP
+movefromPos (x1, y1) (x2, y2)   | x1 >= x2  && y1 > y2 = if xdif > ydif then LEFT     else DOWN
+                                | x1 >= x2  && y1 < y2 = if xdif > ydif then LEFT     else UP
+                                | x1 <  x2  && y1 > y2 = if xdif > ydif then RIGHT    else DOWN
+                                | x1 <  x2  && y1 < y2 = if xdif > ydif then RIGHT    else UP
+                                | otherwise            = STAY
                                 where
                                     xdif = abs $ x1 - x2
                                     ydif = abs $ y1 - y2
@@ -42,18 +43,22 @@ makeMove p UP    n =  up    p n
 makeMove p DOWN  n =  down  p n
 makeMove p LEFT  n =  left  p n
 makeMove p RIGHT n =  right p n
+makeMove p STAY  _ =  p
 
 makeMove' :: Pos -> Move -> Pos
 makeMove' p UP    =  up'    p
 makeMove' p DOWN  =  down'  p
 makeMove' p LEFT  =  left'  p
 makeMove' p RIGHT =  right' p
+makeMove' p STAY  =  p
 
 moveToPos :: Move -> Pos
 moveToPos UP    = (0,-1)
 moveToPos DOWN  = (0, 1)
 moveToPos RIGHT = (1, 0)
-moveToPos LEFT  = (-1, 0)
+moveToPos LEFT  = (-1,0)
+moveToPos STAY  = (0, 0)
+
 
 boundValue :: Int-> Int -> Int -> Int
 boundValue v max min    | v > max   = max
