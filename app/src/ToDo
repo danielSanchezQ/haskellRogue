@@ -4,5 +4,8 @@ Ideas:
 
 ToDo:
     use Random please...
+    instance Random Floor where
+    instance Random Entity where
+    instance Random Hero where
 
 Bugs:
