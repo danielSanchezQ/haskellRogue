@@ -27,8 +27,8 @@ movePos :: Pos -> Pos -> Pos
 movePos (x, y) (x', y') = (x+x', y+y')
 
 up, down, left, right :: Pos -> Int -> Pos
-up      (x, y) n = (x,   y-n)
-down    (x, y) n = (x,   y+n)
+up      (x, y) n = (x,   y+n)
+down    (x, y) n = (x,   y-n)
 left    (x, y) n = (x-n, y)
 right   (x, y) n = (x+n, y)
 
