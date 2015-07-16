@@ -26,12 +26,13 @@ gameLoop (gameState, ranGen) = do
                 (NoAction)  -> gameLoop (gameState, ranGen)
                 (Quit)      -> do   putStrLn "Goodbye"
                                     return ()
-                (TA a)      -> gameLoop (step a gameState, ranGen)
+                (TA a)      -> gameLoop (step ranGen a gameState, ranGen)
                 otherwise   -> do print $ "Unexpected command:" ++ (show command)
                                   gameLoop (gameState, ranGen)
 
 myGame :: RandomGen g => g -> GameState
-myGame g = addEnt (newGame g) exampleEntity
+myGame ranGen = newGame ranGen
+    where
 
 main :: IO()
 main = do

@@ -38,7 +38,7 @@ import Entities
 import Maps
 import Data.List(find,delete)
 import AI
-import System.Random(RandomGen, randomR)
+import System.Random(RandomGen, randomR,split)
 
 data TurnAction = HeroMove Direction | Ranged Pos | Rest    deriving (Show,Eq)
 
@@ -46,11 +46,21 @@ newGame :: RandomGen g => g -> GameState
 newGame g = GameState {hero=newHero, entities=[], world=standardMap g}
 
 newHero :: Hero
-newHero = Entity {ename="Urist", elifes=3, ejob=NoJob, eweapon=NoWeapon, eposition=(9,5), erace=Hero, ebehav=Seek}
+newHero = Entity {ename="Urist", elives=10, ejob=NoJob, eweapon=NoWeapon, eposition=(5,5), erace=Hero, ebehav=Seek}
+
+placeRandomEnt :: RandomGen g => g -> GameState -> GameState
+placeRandomEnt ranGen gameState = addEnt (positionEntity randomEnt validPos) gameState
+    where
+        validPos = findRandomSpot ran1 gameState
+        randomEnt = randomEntity ran2
+        (ran1,ran2) = split ranGen
+
+findRandomSpot :: RandomGen g => g -> GameState -> Pos
+findRandomSpot _ _ = (15,5)
 
 --Does not check entity position
-addEnt :: GameState -> Entity -> GameState
-addEnt gameState ent = gameState {entities=entities gameState ++[ent]}
+addEnt :: Entity -> GameState -> GameState
+addEnt ent gameState = gameState {entities=entities gameState ++[ent]}
 
 moveHero :: GameState -> Direction -> Maybe GameState
 moveHero gameState dir
@@ -71,10 +81,7 @@ doCombat gameState pos = gameState {hero=newHero, entities=newEntities}
                     Nothing -> error "attacked an empty position"
         newEntities = if (getHealth newEnt) > 0 then replaceEnt newEnt $ getEnts gameState
                         -- else delete enemy $ getEnts gameState
-                        else addRandomEnemy $ delete enemy $ getEnts gameState
-
-addRandomEnemy :: [Entity] -> [Entity]
-addRandomEnemy = (++ [randomEnt])
+                        else delete enemy $ getEnts gameState
 
 replaceEnt :: Entity -> [Entity] -> [Entity]
 replaceEnt e [] = [e]
@@ -88,7 +95,9 @@ lookupPos pos = find ((==) pos . getPosition)
 isPositionWalkable :: GameState -> Pos -> Bool
 isPositionWalkable gs pos = isPositionValid gs pos &&
                             isPositionEmpty gs pos &&
-                            ((getCell (getMap gs) pos) == Empty)
+                            (cell == Empty || cell == Door)
+                        where
+                            cell = getCell (getMap gs) pos
 
 isPositionAttackable :: GameState -> Pos -> Bool
 isPositionAttackable gs pos = isPositionValid gs pos &&
@@ -105,13 +114,13 @@ isPositionValid gameState pos = isValidPos pos
         (xmax, ymax) = getSize $ getMap gameState
 
 healHero :: GameState -> GameState
-healHero = id
+healHero gs = gs {hero = (getHero gs) {elives = elives (getHero gs) + 1}}
 
 attackEntity :: GameState -> Direction -> GameState
 attackEntity = const
 
 stepHero :: TurnAction -> GameState -> GameState
-stepHero (Rest) gs = gs
+stepHero (HeroMove STAY) gs = healHero gs
 stepHero (Ranged _) gs = gs
 stepHero (HeroMove dir) gs = 
         case (newGS) of
@@ -120,8 +129,16 @@ stepHero (HeroMove dir) gs =
         where
             newGS = moveHero gs dir
 
-stepEntities :: GameState -> GameState
-stepEntities gs = gs {entities = map (\x-> let m = evalBehaviour x gs in (if isPositionWalkable gs (makeMove' (eposition x) m)  then moveEntity x m else x)) (entities gs)}
+addNewEnemies :: RandomGen g => g -> GameState -> GameState
+addNewEnemies ranGen gs
+    | length (getEnts gs) > 3  = gs
+    | otherwise             = addNewEnemies ran2 $ placeRandomEnt ran1 gs
+        where
+            (ran1,ran2) = split ranGen
 
-step :: TurnAction -> GameState -> GameState
-step ta gs = stepEntities $ stepHero ta gs
+
+stepEntities :: RandomGen g => g -> GameState -> GameState
+stepEntities ranGen gs = addNewEnemies ranGen $ gs {entities = map (\x-> let m = evalBehaviour x gs in (if isPositionWalkable gs (makeMove' (eposition x) m)  then moveEntity x m else x)) (entities gs)}
+
+step :: RandomGen g => g -> TurnAction -> GameState -> GameState
+step ranGen ta gs = stepEntities ranGen $ stepHero ta gs

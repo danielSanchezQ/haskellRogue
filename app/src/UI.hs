@@ -32,6 +32,7 @@ parseCommand 'w' = TA $ HeroMove UP
 parseCommand 's' = TA $ HeroMove DOWN
 parseCommand 'a' = TA $ HeroMove LEFT
 parseCommand 'd' = TA $ HeroMove RIGHT
+parseCommand 'r' = TA $ HeroMove STAY
 --for stupid dvorak users
 parseCommand 't' = TA $ HeroMove UP
 parseCommand 'n' = TA $ HeroMove DOWN

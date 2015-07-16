@@ -2,6 +2,8 @@
 module Entities  where
 import Utils (Pos, Move(..), makeMove', movePos)
 import Maps
+import System.Random(RandomGen, randomR)
+
 data Job        =  Mage     | Healer| Assassin  | Barbarian | NoJob                        deriving (Show,Eq)
 data WType      =  Sword    | Bow   | Rod       | Magic                                    deriving (Show,Eq)
 data Race       =  Hero     | Human | Troll     | Dragon | Elven | Feline | Dwarven        deriving (Show,Eq)
@@ -12,7 +14,7 @@ data Weapon =  Weapon { wname   :: String,
                         wtype   :: WType} | NoWeapon                deriving (Show,Eq)
 
 data Entity =  Entity { ename    :: String,
-                        elifes   :: Int,
+                        elives   :: Int,
                         ejob     :: Job, 
                         eweapon  :: Weapon,
                         eposition:: Pos,
@@ -40,9 +42,8 @@ getEnts = entities
 ---------------------------------------------------------------
 
 
-
 attack :: Entity -> Entity -> (Entity, Entity)
-attack hero monster = (hero{elifes = elifes hero -1}, monster{elifes = elifes monster -1})
+attack hero monster = (hero{elives = elives hero -1}, monster{elives = elives monster -1})
 
 pickWeapon :: Hero -> Weapon -> Entity
 pickWeapon e w = e {eweapon = w}
@@ -51,15 +52,18 @@ changeJob :: Hero -> Job -> Entity
 changeJob e j  = e {ejob = j}
 
 kill :: Entity -> Entity
-kill e = e {elifes = 0}
+kill e = e {elives = 0}
 
 hit :: Entity -> Int -> Entity
-hit e n = e {elifes = remained}
+hit e n = e {elives = remained}
     where
-        remained = elifes e - n
+        remained = elives e - n
 
 moveEntity :: Entity -> Move -> Entity
 moveEntity e m = e {eposition = makeMove' (eposition e) m}
+
+positionEntity :: Entity -> Pos -> Entity
+positionEntity e pos = e {eposition = pos}
 
 -- not needed ATM
 -- moveEntityP :: Entity -> Pos -> Entity
@@ -72,13 +76,15 @@ getPosition :: Entity -> Pos
 getPosition = eposition
 
 getHealth :: Entity -> Int
-getHealth = elifes
+getHealth = elives
 
 exampleEntity :: Entity
 exampleEntity = Entity [] 1 Mage exampleWeapon (2,3) Elven Seek
 
-randomEnt :: Entity
-randomEnt = Entity [] 5 Healer exampleWeapon (12,7) Troll Seek
+randomEntity :: RandomGen g => g -> Entity
+randomEntity ranGen = Entity [] health Healer exampleWeapon (0,0) Troll Seek
+    where
+        (health,_) = randomR (1,5) ranGen
 
 exampleWeapon :: Weapon
 exampleWeapon = Weapon "example weapon" 1 Rod
