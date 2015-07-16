@@ -18,7 +18,7 @@ clearAndDraw f a = do
 draw :: GameState -> IO()
 draw gs = do
     putStrLn $ unlines $ drawGS (getHero gs : (getEnts gs)) (getMap gs)
-    -- putStrLn ("hero position: "++ (show $ getPosition $ getHero gs)
+    putStrLn ("hero position: "++ (show $ getPosition $ getHero gs))
     putStrLn ("\tLife: " ++ (show $ getHealth $ getHero gs))
 
 drawGS :: [Entity] -> Floor -> [String]
@@ -58,6 +58,7 @@ drawCell Wall      = '#'
 drawCell Empty     = '.'
 drawCell Window    = 'x'
 drawCell Door      = '+'
+drawCell Void      = ','
 drawCell _         = 'X'
 
 drawMap :: Floor -> [[Char]]

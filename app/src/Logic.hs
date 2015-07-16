@@ -38,11 +38,12 @@ import Entities
 import Maps
 import Data.List(find,delete)
 import AI
+import System.Random(RandomGen, randomR)
 
 data TurnAction = HeroMove Direction | Ranged Pos | Rest    deriving (Show,Eq)
 
-newGame :: GameState
-newGame = GameState {hero=newHero, entities=[], world=standardMap 0}
+newGame :: RandomGen g => g -> GameState
+newGame g = GameState {hero=newHero, entities=[], world=standardMap g}
 
 newHero :: Hero
 newHero = Entity {ename="Urist", elifes=3, ejob=NoJob, eweapon=NoWeapon, eposition=(9,5), erace=Hero, ebehav=Seek}
