@@ -2,7 +2,7 @@ module Graphics where
 
 import Maps(getCell, getSize, Cell(..), Floor)
 import Entities(Entity, getPosition, Race(..),getRace,getHealth)
-import Data.List(unfoldr, groupBy, sortBy)
+import Data.List(unfoldr, groupBy, sortBy, intersperse)
 import Data.Map(toList)
 import Utils(Pos)
 import Logic
@@ -20,6 +20,8 @@ draw gs = do
     putStrLn $ unlines $ drawGS (getHero gs : (getEnts gs)) (getMap gs)
     putStrLn ("hero position: "++ (show $ getPosition $ getHero gs))
     putStrLn ("\tLife: " ++ (show $ getHealth $ getHero gs))
+    putStrLn ("Enemy: " ++ (concat $ intersperse " " $ map (show . getHealth) $ getEnts gs))
+    putStrLn ("pos:   " ++ (concat $ intersperse " " $ map (show . getPosition) $ getEnts gs))
 
 drawGS :: [Entity] -> Floor -> [String]
 drawGS es m = foldr overlayEs emptyMap es

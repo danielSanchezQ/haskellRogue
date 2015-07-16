@@ -56,7 +56,15 @@ placeRandomEnt ranGen gameState = addEnt (positionEntity randomEnt validPos) gam
         (ran1,ran2) = split ranGen
 
 findRandomSpot :: RandomGen g => g -> GameState -> Pos
-findRandomSpot _ _ = (15,5)
+findRandomSpot ranGen gs
+    | isPositionWalkable gs newPos     = newPos
+    | otherwise                     = findRandomSpot ran1 gs
+        where
+            newPos      = (x,y)
+            (ran1,ran2) = split ranGen
+            (x,ran3)    = randomR (0,xmax) ran2
+            (y, _)      = randomR (0,ymax) ran3
+            (xmax,ymax) = fst $ getMap gs
 
 --Does not check entity position
 addEnt :: Entity -> GameState -> GameState
