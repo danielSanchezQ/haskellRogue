@@ -7,5 +7,6 @@ ToDo:
     instance Random Floor where
     instance Random Entity where
     instance Random Hero where
+    move GameState back to Logic
 
 Bugs:
