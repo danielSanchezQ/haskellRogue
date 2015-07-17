@@ -5,8 +5,8 @@ import Entities
 import Utils
 
 
-evalBehaviour :: Entity -> GameState -> Move
-evalBehaviour e gs = manageBehaviour (ebehav e) e (hero gs)
+evalBehaviour :: Entity -> Hero -> Move
+evalBehaviour e h = manageBehaviour (ebehav e) e h
 
 manageBehaviour :: Behaviour -> Entity -> Hero -> Move
 manageBehaviour bh e h = case bh of Seek        -> manageSeek   e h

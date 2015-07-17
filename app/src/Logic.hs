@@ -42,6 +42,22 @@ import System.Random(RandomGen, randomR,split)
 
 data TurnAction = HeroMove Direction | Ranged Pos | Rest    deriving (Show,Eq)
 
+---------------------------------------------------------------
+data GameState = GameState { hero :: Hero,
+                             entities :: [Entity],
+                             world :: Floor
+                           } deriving Show
+
+getMap :: GameState -> Floor
+getMap = world
+
+getHero :: GameState -> Hero
+getHero = hero
+
+getEnts :: GameState -> [Entity]
+getEnts = entities
+---------------------------------------------------------------
+
 newGame :: RandomGen g => g -> GameState
 newGame g = GameState {hero=newHero, entities=[], world=standardMap g}
 
@@ -146,7 +162,7 @@ addNewEnemies ranGen gs
 
 
 stepEntities :: RandomGen g => g -> GameState -> GameState
-stepEntities ranGen gs = addNewEnemies ranGen $ gs {entities = map (\x-> let m = evalBehaviour x gs in (if isPositionWalkable gs (makeMove' (eposition x) m)  then moveEntity x m else x)) (entities gs)}
+stepEntities ranGen gs = addNewEnemies ranGen $ gs {entities = map (\x-> let m = evalBehaviour x (hero gs) in (if isPositionWalkable gs (makeMove' (eposition x) m)  then moveEntity x m else x)) (entities gs)}
 
 step :: RandomGen g => g -> TurnAction -> GameState -> GameState
 step ranGen ta gs = stepEntities ranGen $ stepHero ta gs

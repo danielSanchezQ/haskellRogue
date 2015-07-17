@@ -25,21 +25,6 @@ data Entity =  Entity { ename    :: String,
 type Hero       = Entity
 type Monster    = Entity
 
----------------------------------------------------------------
-data GameState = GameState { hero :: Hero,
-                             entities :: [Entity],
-                             world :: Floor
-                           } deriving Show
-
-getMap :: GameState -> Floor
-getMap = world
-
-getHero :: GameState -> Hero
-getHero = hero
-
-getEnts :: GameState -> [Entity]
-getEnts = entities
----------------------------------------------------------------
 
 
 attack :: Entity -> Entity -> (Entity, Entity)
