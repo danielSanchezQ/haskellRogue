@@ -3,7 +3,6 @@ Ideas:
     change GameState to monadic (could make its use easier)
 
 ToDo:
-    instance Random Floor where
     instance Random Hero where
 
 Bugs:

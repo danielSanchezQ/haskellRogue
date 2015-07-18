@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances, UndecidableInstances, OverlappingInstances #-}
 -- module Maps (Floor(), getSize, getCell, Cell(..),generateMap, standardMap) where
 module Maps where
 
@@ -10,6 +11,12 @@ data Cell = Wall | Empty | Door | StairDown | StairUp | Window | Exit | Void
 
 -- | size as Pos, Map of all cells with coordinates as Pos
 type Floor = (Pos, Map.Map Pos Cell)
+
+instance Random Floor where
+    randomR _ = random
+    random ranGen = (standardMap gen1, lastGen)
+        where
+            (gen1, lastGen) = split ranGen
 
 -- | generate standard map
 standardMap :: (RandomGen g) => g -> Floor

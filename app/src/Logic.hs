@@ -59,7 +59,9 @@ getEnts = entities
 ---------------------------------------------------------------
 
 newGame :: RandomGen g => g -> GameState
-newGame g = GameState {hero=newHero, entities=[], world=standardMap g}
+newGame ranGen = GameState {hero=newHero, entities=[], world=ranFloor}
+    where
+        ranFloor = (fst $ random ranGen)::Floor
 
 newHero :: Hero
 newHero = Entity {ename="Urist", elives=10, ejob=NoJob, eweapon=NoWeapon, eposition=(5,5), erace=Hero, ebehav=Seek}
