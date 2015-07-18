@@ -38,7 +38,7 @@ import Entities
 import Maps
 import Data.List(find,delete)
 import AI
-import System.Random(RandomGen, randomR,split)
+import System.Random(RandomGen, randomR,split, random)
 
 data TurnAction = HeroMove Direction | Ranged Pos | Rest    deriving (Show,Eq)
 
@@ -67,9 +67,8 @@ newHero = Entity {ename="Urist", elives=10, ejob=NoJob, eweapon=NoWeapon, eposit
 placeRandomEnt :: RandomGen g => g -> GameState -> GameState
 placeRandomEnt ranGen gameState = addEnt (positionEntity randomEnt validPos) gameState
     where
+        (randomEnt, ran1) = random ranGen
         validPos = findRandomSpot ran1 gameState
-        randomEnt = randomEntity ran2
-        (ran1,ran2) = split ranGen
 
 findRandomSpot :: RandomGen g => g -> GameState -> Pos
 findRandomSpot ranGen gs

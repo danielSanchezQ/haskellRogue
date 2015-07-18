@@ -1,12 +1,9 @@
 Ideas:
     switch changing data structures to Lenses (floormaps, entities and its members)
-    change GameState to monadic (could make its use easyer)
+    change GameState to monadic (could make its use easier)
 
 ToDo:
-    use Random please...
     instance Random Floor where
-    instance Random Entity where
     instance Random Hero where
-    move GameState back to Logic
 
 Bugs:
