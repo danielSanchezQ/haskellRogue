@@ -1,7 +1,7 @@
 module Utils where
 
-
-data Move = NORTH | SOUTH | WEST | EAST | STAY deriving (Show, Eq)
+-- ToDo UP and Down are dangerous(see incomplete pattern matches below)!! do we want to keep them here?
+data Move = NORTH | SOUTH | WEST | EAST | STAY | UP | DOWN deriving (Show, Eq)
 --data Pos = Pos Int Int Int
 type Pos = (Int, Int)
 type Direction = Move -- used in a move HeroAction, conceptually same as Move?

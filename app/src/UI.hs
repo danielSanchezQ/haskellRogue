@@ -33,8 +33,8 @@ parseCommand 's' = TA $ HeroMove SOUTH
 parseCommand 'a' = TA $ HeroMove WEST
 parseCommand 'd' = TA $ HeroMove EAST
 parseCommand 'r' = TA $ HeroMove STAY
-parseCommand '>' = TA $ HeroMove DOWN
-parseCommand '<' = TA $ HeroMove UP
+parseCommand '>' = TA $ ClimbDown
+parseCommand '<' = TA $ ClimbUp
 --for stupid dvorak users
 parseCommand 't' = TA $ HeroMove NORTH
 parseCommand 'n' = TA $ HeroMove SOUTH

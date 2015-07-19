@@ -13,7 +13,7 @@ clearAndDraw :: (a->IO())-> a -> IO()
 clearAndDraw f a = do
     replicateM_ 100 (putStrLn "")
     f a
-    replicateM_ 20  (putStrLn "")
+    -- replicateM_ 20  (putStrLn "")
 
 draw :: GameState -> IO()
 draw gs = do
@@ -61,6 +61,8 @@ drawCell Empty     = '.'
 drawCell Window    = 'x'
 drawCell Door      = '+'
 drawCell Void      = ','
+drawCell StairUp   = '<'
+drawCell StairDown = '>'
 drawCell _         = 'X'
 
 drawMap :: Floor -> [[Char]]

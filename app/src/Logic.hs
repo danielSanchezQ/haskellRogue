@@ -40,7 +40,7 @@ import Data.List(find,delete)
 import AI
 import System.Random(RandomGen, randomR,split, random)
 
-data TurnAction = HeroMove Direction | Ranged Pos | Rest    deriving (Show,Eq)
+data TurnAction = HeroMove Direction |ClimbUp | ClimbDown | Ranged Pos | Rest    deriving (Show,Eq)
 
 ---------------------------------------------------------------
 data GameState = GameState { hero :: Hero,
@@ -73,15 +73,17 @@ placeRandomEnt ranGen gameState = addEnt (positionEntity randomEnt validPos) gam
         validPos = findRandomSpot ran1 gameState
 
 findRandomSpot :: RandomGen g => g -> GameState -> Pos
-findRandomSpot ranGen gs
-    | isPositionWalkable gs newPos     = newPos
-    | otherwise                     = findRandomSpot ran1 gs
+findRandomSpot ranGen gameState
+    | isPositionWalkable (getMap gameState) newPos     = newPos
+    | otherwise                     = findRandomSpot ran2 gameState
         where
-            newPos      = (x,y)
-            (ran1,ran2) = split ranGen
-            (x,ran3)    = randomR (0,xmax) ran2
-            (y, _)      = randomR (0,ymax) ran3
-            (xmax,ymax) = fst $ getMap gs
+            newPos = getRandomEmpty ran1 $ getMap gameState
+            -- newPos      = (x,y)
+            (ran1,ran') = split ranGen
+            (ran2,ran3) = split ran'
+            -- (x,ran3)    = randomR (0,xmax) ran2
+            -- (y, _)      = randomR (0,ymax) ran3
+            -- (xmax,ymax) = fst floor
 
 --Does not check entity position
 addEnt :: Entity -> GameState -> GameState
@@ -89,8 +91,8 @@ addEnt ent gameState = gameState {entities=entities gameState ++[ent]}
 
 moveHero :: GameState -> Direction -> Maybe GameState
 moveHero gameState dir
-    | isPositionWalkable gameState (x2,y2)  = Just gameState {hero = moveEntity (hero gameState) dir}
     | isPositionAttackable gameState (x2,y2)= Just $ doCombat gameState (x2,y2)
+    | isPositionWalkable (getMap gameState) (x2,y2)  = Just gameState {hero = moveEntity (hero gameState) dir}
     | otherwise                             = Nothing
         where
             (x1,y1) = getPosition $ getHero gameState
@@ -117,26 +119,17 @@ replaceEnt e (e1:es)
 lookupPos :: Pos -> [Entity] -> Maybe Entity
 lookupPos pos = find ((==) pos . getPosition)
 
-isPositionWalkable :: GameState -> Pos -> Bool
-isPositionWalkable gs pos = isPositionValid gs pos &&
-                            isPositionEmpty gs pos &&
-                            (cell == Empty || cell == Door)
-                        where
-                            cell = getCell (getMap gs) pos
-
 isPositionAttackable :: GameState -> Pos -> Bool
-isPositionAttackable gs pos = isPositionValid gs pos &&
+isPositionAttackable gs pos = isPositionValid (getMap gs) pos &&
                               (Nothing /= (lookupPos pos $ getEnts gs))
 
--- | checks if there are entities on a position
-isPositionEmpty :: GameState -> Pos -> Bool
-isPositionEmpty gs pos = isPositionValid gs pos && (not $ any ((pos ==) . getPosition) $ entities gs)
 
-isPositionValid :: GameState -> Pos -> Bool
-isPositionValid gameState pos = isValidPos pos
-    where
-        isValidPos (x,y) = (x>0) && (y>0) && (x<=xmax) && (y<=ymax)
-        (xmax, ymax) = getSize $ getMap gameState
+climbDown :: RandomGen g => g -> GameState -> GameState
+climbDown ranGen gs
+    | isOnDownStair     = newGame ranGen
+    | otherwise         = gs
+        where
+            isOnDownStair = StairDown == getCell (getMap gs)(getPosition $ getHero gs)
 
 healHero :: GameState -> GameState
 healHero gs = gs {hero = (getHero gs) {elives = elives (getHero gs) + 1}}
@@ -153,6 +146,7 @@ stepHero (HeroMove dir) gs =
             Just ngs        -> ngs
         where
             newGS = moveHero gs dir
+stepHero _ gs = gs
 
 addNewEnemies :: RandomGen g => g -> GameState -> GameState
 addNewEnemies ranGen gs
@@ -163,7 +157,8 @@ addNewEnemies ranGen gs
 
 
 stepEntities :: RandomGen g => g -> GameState -> GameState
-stepEntities ranGen gs = addNewEnemies ranGen $ gs {entities = map (\x-> let m = evalBehaviour x (hero gs) in (if isPositionWalkable gs (makeMove' (eposition x) m)  then moveEntity x m else x)) (entities gs)}
+stepEntities ranGen gs = addNewEnemies ranGen $ gs {entities = map (\x-> let m = evalBehaviour x (hero gs) in (if isPositionWalkable (getMap gs) (makeMove' (eposition x) m)  then moveEntity x m else x)) (entities gs)}
 
 step :: RandomGen g => g -> TurnAction -> GameState -> GameState
+step ranGen ClimbDown gs = climbDown ranGen gs
 step ranGen ta gs = stepEntities ranGen $ stepHero ta gs

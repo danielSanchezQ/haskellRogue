@@ -7,7 +7,8 @@ import qualified Data.Map.Strict as Map
 import System.Random(RandomGen,randomR,Random,split,random)
 import Data.Tuple(swap)
 
-roomSide = 10
+-- height and width of the rooms/tiles that make up a floor
+roomSide = 12
 
 data Cell = Wall | Empty | Door | StairDown | StairUp | Window | Exit | Void
     deriving (Show, Read, Eq)
@@ -23,7 +24,9 @@ instance Random Floor where
 
 -- | generate standard map
 standardMap :: (RandomGen g) => g -> Floor
-standardMap ranGen = generateMap ranGen (5,3)
+standardMap ranGen = placeStairs ran1 $generateMap ran2 (4,3)
+    where
+        (ran1,ran2) = split ranGen
 
 -- | generate a floor with specific size
 --   generateMap takes a seed and a size as Pos
@@ -33,6 +36,16 @@ generateMap ranGen (x,y) = roomMergeV ran1 (generateRow ran1 x) (generateMap ran
     where
         (ran1,ran') = split ranGen
         (ran2,ran3) = split ran'
+
+changeCell :: Pos -> Cell -> Floor -> Floor
+changeCell pos newCell floor@(size, cellMap)
+    | isPositionValid floor pos = (size, Map.insert pos newCell cellMap)
+    | otherwise = floor
+
+placeStairs :: RandomGen g => g -> Floor -> Floor
+placeStairs ranGen floor = changeCell ranPos StairDown floor
+    where
+        ranPos = getRandomEmpty ranGen floor
 
 generateRow :: RandomGen g => g -> Int -> Floor
 generateRow ranGen 1 = generateRoom ranGen roomSide roomSide
@@ -58,8 +71,8 @@ roomMergeV ranGen (p1, room1) (p2, room2) = (addPairs p1 p2, connectRooms seqRoo
         makeFloor = Map.unionWithKey placeDoors floors
         floors = Map.fromList $ [((corridorX,y),Empty) | y <- halfToHalf]
         corridorX :: Int
-        corridorX = 5 + (10 * (fst (randomR (0,(div (fst p1) 10)-1) ranGen)))
-        halfToHalf = [(roomSide `div` 2)..(roomSide `div` 2) + roomSide]
+        corridorX = (div roomSide 2) -1 + (fst $ randomR(0,2) ranGen) + (roomSide * (fst (randomR (0,(div (fst p1) roomSide)-1) ranGen)))
+        halfToHalf = [(roomSide `div` 2)+1..(roomSide `div` 2) + roomSide - 1]
         placeDoors :: Pos -> Cell -> Cell -> Cell
         placeDoors (a,b) newCell oldCell
             | oldCell == Wall && ran= Door
@@ -84,8 +97,8 @@ generateRoom ranGen xmax ymax = ((xmax, ymax), Map.fromList $ zip (makeGrid xmax
     where
         (x,rg2) = (randomR (1,3) ranGen)
         (y,rg3) = (randomR (1,3) rg2)
-        (w,rg4) = (randomR (5,xmax-x) rg3)
-        (h,_) = (randomR (5,ymax-y) rg4)
+        (w,rg4) = (randomR (7,xmax-x-1) rg3)
+        (h,_) = (randomR (7,ymax-y) rg4)
         cells = take ymax $ voidTop ++ [edge] ++ (replicate (h-2) middle) ++ [edge] ++ (repeat voidLine)
         voidTop :: [[Cell]]
         voidTop = replicate y voidLine
@@ -96,8 +109,34 @@ generateRoom ranGen xmax ymax = ((xmax, ymax), Map.fromList $ zip (makeGrid xmax
         edge = take xmax $ void x ++ replicate w Wall ++ repeat Void
         middle = take xmax $ void x ++  Wall : (take (w-2) $ repeat Empty) ++ [Wall] ++ voidLine
 
-addExit :: Int -> Int -> Floor -> Floor
-addExit = undefined
+isPositionValid :: Floor -> Pos -> Bool
+isPositionValid floor pos = isValidPos pos
+    where
+        isValidPos (x,y) = (x>0) && (y>0) && (x<=xmax) && (y<=ymax)
+        (xmax, ymax) = getSize floor
+
+isPositionWalkable :: Floor -> Pos -> Bool
+isPositionWalkable floor pos = isPositionValid floor pos &&
+                            elem cell [Door, Empty, StairDown, StairUp]
+                        where
+                            cell = getCell floor pos
+
+-- | returns a random Pos that points to a Walkable cell
+getRandomEmpty :: RandomGen g => g -> Floor -> Pos
+getRandomEmpty ranGen floor@(size,cells)
+    | isThereNone   = error ("no empty place on the map")
+    | isGood        = newPos
+    | otherwise     = getRandomEmpty newRan newFloor
+        where
+            isThereNone = length allEmpties == 0
+            isGood = isPositionWalkable floor newPos
+            newPos = allEmpties!!(fst $ randomR(0,length allEmpties) ran1)
+            allEmpties :: [Pos]
+            allEmpties = Map.keys $ Map.filter isWalkable cells
+            (newRan,ran1) = split ranGen
+            newFloor :: Floor
+            newFloor = (size, Map.filter isWalkable cells)
+            isWalkable cell = elem cell [Door, Empty, StairDown, StairUp]
 
 -- | get the Cell at Pos
 getCell :: Floor -> Pos -> Cell
