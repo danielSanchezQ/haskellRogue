@@ -4,7 +4,10 @@ module Maps where
 
 import Utils(Pos)
 import qualified Data.Map.Strict as Map
-import System.Random--(RandomGen,randomR)
+import System.Random(RandomGen,randomR,Random,split,random)
+import Data.Tuple(swap)
+
+roomSide = 10
 
 data Cell = Wall | Empty | Door | StairDown | StairUp | Window | Exit | Void
     deriving (Show, Read, Eq)
@@ -20,62 +23,61 @@ instance Random Floor where
 
 -- | generate standard map
 standardMap :: (RandomGen g) => g -> Floor
-standardMap ranGen = generateMap ranGen (4,3)
+standardMap ranGen = generateMap ranGen (5,3)
 
 -- | generate a floor with specific size
 --   generateMap takes a seed and a size as Pos
 generateMap :: RandomGen g => g -> Pos -> Floor
 generateMap ran (x,1) = generateRow ran x
-generateMap ranGen (x,y) = roomMergeV (generateRow ran1 x) (generateMap ran2 (x,y-1))
+generateMap ranGen (x,y) = roomMergeV ran1 (generateRow ran1 x) (generateMap ran2 (x,y-1))
     where
-        (ran1,ran2) = split ranGen
+        (ran1,ran') = split ranGen
+        (ran2,ran3) = split ran'
 
 generateRow :: RandomGen g => g -> Int -> Floor
-generateRow ranGen 1 = generateRoom ranGen 10 10
-generateRow ranGen n = roomMergeH (generateRoom ran1 10 10) (generateRow ran2 (n-1))
+generateRow ranGen 1 = generateRoom ranGen roomSide roomSide
+generateRow ranGen n = roomMergeH ran3 (generateRoom ran1 roomSide roomSide) (generateRow ran2 (n-1))
     where
-        (ran1,ran2) = split ranGen
+        (ran1,ran') = split ranGen
+        (ran2,ran3) = split ran'
 
-rowsMerge :: [Floor] -> Floor
-rowsMerge (floor:[]) = floor
-rowsMerge (floor1: fs) = roomMergeV floor1 $ rowsMerge fs
+rowsMerge :: RandomGen g => g -> [Floor] -> Floor
+rowsMerge _ (floor:[]) = floor
+rowsMerge ranGen (floor1: fs) = roomMergeV ran1 floor1 $ rowsMerge ran2 fs
+    where
+        (ran1, ran2) = split ranGen
 
-roomMergeV :: Floor -> Floor -> Floor
-roomMergeV (p1, room1) (p2, room2) = (addPairs p1 p2, connectRooms seqRooms)
+roomMergeV :: RandomGen g => g -> Floor -> Floor -> Floor
+roomMergeV ranGen (p1, room1) (p2, room2) = (addPairs p1 p2, connectRooms seqRooms)
     where
         addPairs (x1, y1) (x2, y2) = (x1, y1+y2)
         seqRooms = Map.union room1 (Map.mapKeys shiftKeys room2)
         shiftKeys :: Pos -> Pos
-        shiftKeys (x,y) = (x,10+y)
+        shiftKeys (x,y) = (x,roomSide+y)
         connectRooms = makeFloor . makeWalls
-        makeFloor = Map.unionWith placeDoors floors
-        floors = Map.fromList $ [((5,y),Empty) | y <- [5..15]]
-        placeDoors newCell oldCell
-            | oldCell == Wall       = Door
+        makeFloor = Map.unionWithKey placeDoors floors
+        floors = Map.fromList $ [((corridorX,y),Empty) | y <- halfToHalf]
+        corridorX :: Int
+        corridorX = 5 + (10 * (fst (randomR (0,(div (fst p1) 10)-1) ranGen)))
+        halfToHalf = [(roomSide `div` 2)..(roomSide `div` 2) + roomSide]
+        placeDoors :: Pos -> Cell -> Cell -> Cell
+        placeDoors (a,b) newCell oldCell
+            | oldCell == Wall && ran= Door
             | otherwise             = Empty
+                where
+                    -- 30 % of connections will have doors
+                    ran = (mod ((fst $ randomR (0,10) ranGen)+a+b) 10) > 6
         makeWalls = Map.unionWith (prefereEmpty) walls
-        walls = Map.fromList $ [((x,y),Wall) | x<- [4,6], y<-[5..15]]
+        walls = Map.fromList $ [((x,y),Wall) | x<- [corridorX-1,corridorX+1], y<-halfToHalf]
         prefereEmpty newCell oldCell
             | oldCell == Empty      = Empty
-            -- | oldCell == Wall       = Door
+            | oldCell == Door       = Door
             | otherwise             = newCell
 
-roomMergeH :: Floor -> Floor -> Floor
-roomMergeH (p1, room1) (p2, room2) = (addPairs p1 p2, connectRooms seqRooms)
-    where
-        addPairs (x1, y1) (x2, y2) = (x1+x2, y1)
-        seqRooms = Map.union room1 (Map.mapKeys shiftKeys room2)
-        shiftKeys :: Pos -> Pos
-        shiftKeys (x,y) = (10+x,y)
-        connectRooms = makeFloor . makeWalls
-        makeFloor = Map.union floors
-        floors = Map.fromList $ [((x,5),Empty) | x <- [5..15]]
-        makeWalls = Map.unionWith (prefereEmpty) walls
-        walls = Map.fromList $ [((x,y),Wall) | y<- [4,6], x<-[5..15]]
-        prefereEmpty newCell oldCell
-            | oldCell == Empty      = Empty
-            -- | oldCell == Wall       = Door
-            | otherwise             = newCell
+rotateMap :: Floor -> Floor
+rotateMap (size, cells) = (swap size, Map.mapKeys swap cells)
+
+roomMergeH ranGen r1 r2 = rotateMap $ roomMergeV ranGen (rotateMap r1) (rotateMap r2)
 
 generateRoom :: RandomGen g => g -> Int -> Int -> Floor
 generateRoom ranGen xmax ymax = ((xmax, ymax), Map.fromList $ zip (makeGrid xmax ymax) $ concat cells)
