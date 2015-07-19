@@ -28,16 +28,18 @@ type Message    = String
 type Menu       = Message
 
 parseCommand :: Char -> Action
-parseCommand 'w' = TA $ HeroMove UP
-parseCommand 's' = TA $ HeroMove DOWN
-parseCommand 'a' = TA $ HeroMove LEFT
-parseCommand 'd' = TA $ HeroMove RIGHT
+parseCommand 'w' = TA $ HeroMove NORTH
+parseCommand 's' = TA $ HeroMove SOUTH
+parseCommand 'a' = TA $ HeroMove WEST
+parseCommand 'd' = TA $ HeroMove EAST
 parseCommand 'r' = TA $ HeroMove STAY
+parseCommand '>' = TA $ HeroMove DOWN
+parseCommand '<' = TA $ HeroMove UP
 --for stupid dvorak users
-parseCommand 't' = TA $ HeroMove UP
-parseCommand 'n' = TA $ HeroMove DOWN
-parseCommand 'h' = TA $ HeroMove LEFT
-parseCommand '-' = TA $ HeroMove RIGHT
+parseCommand 't' = TA $ HeroMove NORTH
+parseCommand 'n' = TA $ HeroMove SOUTH
+parseCommand 'h' = TA $ HeroMove WEST
+parseCommand '-' = TA $ HeroMove EAST
 
 parseCommand 'm' = Menu
 parseCommand 'q' = Quit

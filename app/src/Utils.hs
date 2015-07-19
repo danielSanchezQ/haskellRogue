@@ -1,22 +1,22 @@
 module Utils where
 
 
-data Move = UP | DOWN | LEFT | RIGHT | STAY deriving (Show, Eq)
+data Move = NORTH | SOUTH | WEST | EAST | STAY deriving (Show, Eq)
 --data Pos = Pos Int Int Int
 type Pos = (Int, Int)
 type Direction = Move -- used in a move HeroAction, conceptually same as Move?
 
 reverseMove :: Move -> Move
-reverseMove UP      = DOWN
-reverseMove DOWN    = UP
-reverseMove LEFT    = RIGHT
-reverseMove RIGHT   = LEFT
+reverseMove NORTH      = SOUTH
+reverseMove SOUTH    = NORTH
+reverseMove WEST    = EAST
+reverseMove EAST   = WEST
 
 movefromPos :: Pos -> Pos -> Move
-movefromPos (x1, y1) (x2, y2)   | x1 >= x2  && y1 > y2 = if xdif > ydif then LEFT     else DOWN
-                                | x1 >= x2  && y1 < y2 = if xdif > ydif then LEFT     else UP
-                                | x1 <  x2  && y1 > y2 = if xdif > ydif then RIGHT    else DOWN
-                                | x1 <  x2  && y1 < y2 = if xdif > ydif then RIGHT    else UP
+movefromPos (x1, y1) (x2, y2)   | x1 >= x2  && y1 > y2 = if xdif > ydif then WEST     else SOUTH
+                                | x1 >= x2  && y1 < y2 = if xdif > ydif then WEST     else NORTH
+                                | x1 <  x2  && y1 > y2 = if xdif > ydif then EAST    else SOUTH
+                                | x1 <  x2  && y1 < y2 = if xdif > ydif then EAST    else NORTH
                                 | otherwise            = STAY
                                 where
                                     xdif = abs $ x1 - x2
@@ -39,24 +39,24 @@ left'   p = left    p 1
 right'  p = right   p 1
 
 makeMove :: Pos -> Move -> Int -> Pos
-makeMove p UP    n =  up    p n
-makeMove p DOWN  n =  down  p n
-makeMove p LEFT  n =  left  p n
-makeMove p RIGHT n =  right p n
+makeMove p NORTH    n =  up    p n
+makeMove p SOUTH  n =  down  p n
+makeMove p WEST  n =  left  p n
+makeMove p EAST n =  right p n
 makeMove p STAY  _ =  p
 
 makeMove' :: Pos -> Move -> Pos
-makeMove' p UP    =  up'    p
-makeMove' p DOWN  =  down'  p
-makeMove' p LEFT  =  left'  p
-makeMove' p RIGHT =  right' p
+makeMove' p NORTH    =  up'    p
+makeMove' p SOUTH  =  down'  p
+makeMove' p WEST  =  left'  p
+makeMove' p EAST =  right' p
 makeMove' p STAY  =  p
 
 moveToPos :: Move -> Pos
-moveToPos UP    = (0,-1)
-moveToPos DOWN  = (0, 1)
-moveToPos RIGHT = (1, 0)
-moveToPos LEFT  = (-1,0)
+moveToPos NORTH    = (0,-1)
+moveToPos SOUTH  = (0, 1)
+moveToPos EAST = (1, 0)
+moveToPos WEST  = (-1,0)
 moveToPos STAY  = (0, 0)
 
 
