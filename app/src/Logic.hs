@@ -25,6 +25,9 @@ module Logic
         getMap,
         getHero,
         getEnts,
+        getTurnNumber,
+        getFloorNumber,
+        getKillList,
         newHero,
         addEnt,
         stepHero,
@@ -45,7 +48,10 @@ data TurnAction = HeroMove Direction |ClimbUp | ClimbDown | Ranged Pos | Rest   
 ---------------------------------------------------------------
 data GameState = GameState { hero :: Hero,
                              entities :: [Entity],
-                             world :: Floor
+                             world :: Floor,
+                             turnNumber :: Int,
+                             floorNumber :: Int,
+                             killList :: [Entity]
                            } deriving Show
 
 getMap :: GameState -> Floor
@@ -56,15 +62,25 @@ getHero = hero
 
 getEnts :: GameState -> [Entity]
 getEnts = entities
+
+getTurnNumber :: GameState -> Int
+getTurnNumber = turnNumber
+
+getFloorNumber :: GameState -> Int
+getFloorNumber = floorNumber
+
+getKillList :: GameState -> [Entity]
+getKillList = killList
+
 ---------------------------------------------------------------
 
 newGame :: RandomGen g => g -> GameState
-newGame ranGen = GameState {hero=newHero, entities=[], world=ranFloor}
+newGame ranGen = GameState {hero=newHero, entities=[], world=ranFloor, turnNumber = 0, floorNumber = 1, killList = []}
     where
         ranFloor = (fst $ random ranGen)::Floor
 
 newHero :: Hero
-newHero = Entity {ename="Urist", elives=10, ejob=NoJob, eweapon=NoWeapon, eposition=(5,5), erace=Hero, ebehav=Seek}
+newHero = Entity {ename="Urist", elives=3, ejob=NoJob, eweapon=NoWeapon, eposition=(5,5), erace=Hero, ebehav=Seek}
 
 placeRandomEnt :: RandomGen g => g -> GameState -> GameState
 placeRandomEnt ranGen gameState = addEnt (positionEntity randomEnt validPos) gameState
@@ -99,16 +115,16 @@ moveHero gameState dir
             (x2,y2) = makeMove' (x1,y1) dir
 
 doCombat :: GameState -> Pos -> GameState
-doCombat gameState pos = gameState {hero=newHero, entities=newEntities}
+doCombat gameState pos = gameState {hero=newHero, entities=newEntities, killList=newKillList}
     where
         (newHero,newEnt) = attack (hero gameState) enemy
         enemy :: Entity
         enemy = case lookupPos pos $ getEnts gameState of
                     Just e  -> e
                     Nothing -> error "attacked an empty position"
-        newEntities = if (getHealth newEnt) > 0 then replaceEnt newEnt $ getEnts gameState
+        (newEntities,newKillList) = if (getHealth newEnt) > 0 then ((replaceEnt newEnt $ getEnts gameState),killList gameState)
                         -- else delete enemy $ getEnts gameState
-                        else delete enemy $ getEnts gameState
+                        else (delete enemy $ getEnts gameState, newEnt:(killList gameState))
 
 replaceEnt :: Entity -> [Entity] -> [Entity]
 replaceEnt e [] = [e]
@@ -126,7 +142,7 @@ isPositionAttackable gs pos = isPositionValid (getMap gs) pos &&
 
 climbDown :: RandomGen g => g -> GameState -> GameState
 climbDown ranGen gs
-    | isOnDownStair     = newGame ranGen
+    | isOnDownStair     = (newGame ranGen){turnNumber =1 + getTurnNumber gs, floorNumber = 1 + getFloorNumber gs}
     | otherwise         = gs
         where
             isOnDownStair = StairDown == getCell (getMap gs)(getPosition $ getHero gs)
@@ -161,4 +177,4 @@ stepEntities ranGen gs = addNewEnemies ranGen $ gs {entities = map (\x-> let m =
 
 step :: RandomGen g => g -> TurnAction -> GameState -> GameState
 step ranGen ClimbDown gs = climbDown ranGen gs
-step ranGen ta gs = stepEntities ranGen $ stepHero ta gs
+step ranGen ta gs = stepEntities ranGen $ stepHero ta gs{turnNumber =1 + getTurnNumber gs}

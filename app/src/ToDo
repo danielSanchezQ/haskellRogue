@@ -4,5 +4,6 @@ Ideas:
 
 ToDo:
     instance Random Hero where
+    rewrite drawDeathScreen
 
 Bugs:

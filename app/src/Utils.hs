@@ -72,3 +72,7 @@ checkRange (x1, y1) (x2, y2) r = (round . sqrt $ fromIntegral xysum) <= r
         y'      = (y1 - y2) ^ 2
         xysum   = x' + y'
 
+cutPadToWith :: Int -> a -> [a] -> [a]
+cutPadToWith num space list
+    | length list == num    = take num list
+    | otherwise             = list ++ (replicate (num - length list) space)

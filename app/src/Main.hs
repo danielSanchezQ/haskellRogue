@@ -10,7 +10,9 @@ import System.Random (getStdGen,RandomGen,split)
 gameLoop :: RandomGen g => (GameState, g) -> IO()
 gameLoop (gameState, ranGen) = do
         if (getHealth $ getHero $ gameState) <= 0 then do
-            choice <- ask "\nYou died!!\nWant to try again y/n" yesNoChoice
+            choice <- do
+                drawDeathScreen gameState
+                ask "\nYou died!!\nWant to try again y/n" yesNoChoice
             case choice of
                 Accept      -> gameLoop (myGame ran1, ran2)
                 Deny        -> putStrLn "Goodbye" >> return ()

@@ -1,10 +1,10 @@
 module Graphics where
 
 import Maps(getCell, getSize, Cell(..), Floor)
-import Entities(Entity, getPosition, Race(..),getRace,getHealth)
+import Entities(Entity, getPosition, Race(..),getRace,getHealth, getName, getJob)
 import Data.List(unfoldr, groupBy, sortBy, intersperse)
 import Data.Map(toList)
-import Utils(Pos)
+import Utils(Pos, cutPadToWith)
 import Logic
 import Control.Monad
 
@@ -22,6 +22,39 @@ draw gs = do
     putStrLn ("\tLife: " ++ (show $ getHealth $ getHero gs))
     putStrLn ("Enemy: " ++ (concat $ intersperse " " $ map (show . getHealth) $ getEnts gs))
     putStrLn ("pos:   " ++ (concat $ intersperse " " $ map (show . getPosition) $ getEnts gs))
+    putStrLn ("Turn: " ++ (show $ getTurnNumber gs) ++ "\tFloor Number: " ++ (show $ getFloorNumber gs))
+
+
+-- ToDo: rewrite this in a nicer way
+drawDeathScreen :: GameState -> IO()
+drawDeathScreen gs = clearAndDraw drawDeathScreen' gs
+drawDeathScreen' gs = do
+    putStrLn  "\t --------------\t\t Your kills:"
+    putStrLn  "\t/              \\"
+    putStrLn ("\t|              |\t" ++ kill1)
+    putStrLn ("\t|   R. I. P.   |\t" ++ kill2)
+    putStrLn ("\t|              |\t" ++ kill3)
+    putStrLn ("\t|  died at L" ++ floorNum ++ " |\t" ++ kill4)
+    putStrLn ("\t|  on turn "  ++ turnNum  ++ " |\t" ++ kill5)
+    putStrLn ("\t|              |\t" ++ kill6)
+    foldM_ printLine "" kills
+        where
+            floorNum = cutPadToWith 2 ' ' $ show (getFloorNumber gs)
+            turnNum = cutPadToWith 3 ' ' $ show (getTurnNumber gs)
+            printLine :: String -> Entity -> IO(String)
+            printLine a ent = do
+                putStrLn ("\t|\t    |\t" ++ printKill ent)
+                return "a"
+            kill1 = if killNum > 0 then printKill $ head  $  getKillList gs else ""
+            kill2 = if killNum > 1 then printKill $ (getKillList gs)!!1     else ""
+            kill3 = if killNum > 2 then printKill $ (getKillList gs)!!2     else ""
+            kill4 = if killNum > 3 then printKill $ (getKillList gs)!!3     else ""
+            kill5 = if killNum > 4 then printKill $ (getKillList gs)!!4     else ""
+            kill6 = if killNum > 5 then printKill $ (getKillList gs)!!5     else ""
+            kills = if killNum > 6 then drop 2 (getKillList gs) else []
+            printKill :: Entity -> String
+            printKill ent = getName ent ++ " the " ++ (show $ getRace ent) ++ " " ++ (show $ getJob ent)
+            killNum = length $ getKillList gs
 
 drawGS :: [Entity] -> Floor -> [String]
 drawGS es m = foldr overlayEs emptyMap es

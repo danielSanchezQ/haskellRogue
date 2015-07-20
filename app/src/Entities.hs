@@ -84,6 +84,12 @@ getPosition = eposition
 getHealth :: Entity -> Int
 getHealth = elives
 
+getName :: Entity -> String
+getName = ename
+
+getJob :: Entity -> Job
+getJob = ejob
+
 exampleEntity :: Entity
 exampleEntity = Entity [] 1 Mage exampleWeapon (2,3) Elven Seek
 
